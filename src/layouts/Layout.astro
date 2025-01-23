@@ -1,3 +1,8 @@
+---
+import Header from '@/components/Header';
+import { ClientRouter } from 'astro:transitions';
+---
+
 <!doctype html>
 <html lang="en">
 	<head>
@@ -5,9 +10,11 @@
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
+		<title>Minecraft Server List</title>
+		<ClientRouter/>
 	</head>
 	<body>
+		<Header client:load/>
 		<slot />
 	</body>
 </html>

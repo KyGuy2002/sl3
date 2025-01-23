@@ -37,3 +37,9 @@ export const allTagsTable = sqliteTable("all_tags", {
     pk: primaryKey({ columns: [table.name, table.mode] })
   };
 });
+
+
+export const accountsTable = sqliteTable("accounts", {
+  id: text().notNull().primaryKey(),
+  
+});
