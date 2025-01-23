@@ -7,8 +7,8 @@
     "build": "astro build",
     "preview": "astro build && wrangler pages dev",
     "astro": "astro",
-    "deploy": "astro build && wrangler pages deploy",
-    "cf-typegen": "wrangler types"
+    "find-local-db": "find .wrangler/state/v3/d1/miniflare-D1DatabaseObject -type f -name '*.sqlite' -print -quit",
+    "db:update": "npx drizzle-kit generate | tee output.log | grep -q 'No schema changes' && echo '=== No changes!' && exit 0; cat ./drizzle/$(ls ./drizzle | tail -2 | head -1) > schema.sql; npx wrangler d1 execute DB --file 'schema.sql'"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^12.2.1",
@@ -18,8 +18,11 @@
     "@types/react": "^19.0.7",
     "@types/react-dom": "^19.0.3",
     "astro": "^5.1.8",
+    "better-sqlite3": "^11.8.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dotenv": "^16.4.7",
+    "drizzle-orm": "^0.38.4",
     "lucide-react": "^0.473.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -29,6 +32,8 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250121.0",
+    "drizzle-kit": "^0.30.2",
+    "tsx": "^4.19.2",
     "wrangler": "^3.105.0"
   }
 }
