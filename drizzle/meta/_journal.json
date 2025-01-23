@@ -15,6 +15,13 @@
       "when": 1737599864163,
       "tag": "0001_fearless_sleeper",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1737617576264,
+      "tag": "0002_wandering_shen",
+      "breakpoints": true
     }
   ]
 }

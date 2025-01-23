@@ -1,8 +1,10 @@
 No config path provided, using default 'drizzle.config.ts'
 Reading config file '/home/kylan/projects/sl3/drizzle.config.ts'
-3 tables
+5 tables
+accounts 4 columns 0 indexes 0 fks
 all_tags 4 columns 0 indexes 0 fks
 server_modes 5 columns 0 indexes 1 fks
+passkeys 9 columns 0 indexes 1 fks
 servers 10 columns 0 indexes 0 fks
 
-No schema changes, nothing to migrate 😴
+[✓] Your SQL migration file ➜ drizzle/0002_wandering_shen.sql 🚀

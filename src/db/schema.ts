@@ -1,4 +1,4 @@
-import { int, sqliteTable, text, primaryKey } from "drizzle-orm/sqlite-core";
+import { int, sqliteTable, text, primaryKey, blob } from "drizzle-orm/sqlite-core";
 
 export const serversTable = sqliteTable("servers", {
   id: text().notNull().primaryKey(),
@@ -41,5 +41,20 @@ export const allTagsTable = sqliteTable("all_tags", {
 
 export const accountsTable = sqliteTable("accounts", {
   id: text().notNull().primaryKey(),
-  
+  username: text().notNull(),
+  createdAt: int().notNull(),
+  passkeyChallenge: text(),
+});
+
+
+export const passkeysTable = sqliteTable("passkeys", {
+  id: text().notNull().references(() => accountsTable.id),
+  credId: text().notNull().primaryKey(),
+  credPublicKey: blob().notNull(),
+  transports: text().notNull(),
+  counter: int().notNull(),
+  deviceType: text().notNull(),
+  backedUp: int({ mode: 'boolean' }).notNull(),
+  createdAt: int().notNull(),
+  lastUsed: int(),
 });
