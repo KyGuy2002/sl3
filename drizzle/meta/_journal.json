@@ -22,6 +22,48 @@
       "when": 1737617576264,
       "tag": "0002_wandering_shen",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1737678672733,
+      "tag": "0003_slim_zombie",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1737678847908,
+      "tag": "0004_bouncy_miracleman",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1737678903163,
+      "tag": "0005_nifty_screwball",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1737680861671,
+      "tag": "0006_opposite_shockwave",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1737680872755,
+      "tag": "0007_majestic_captain_britain",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1737681191555,
+      "tag": "0008_far_tenebrous",
+      "breakpoints": true
     }
   ]
 }

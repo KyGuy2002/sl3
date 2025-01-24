@@ -42,8 +42,7 @@ export const allTagsTable = sqliteTable("all_tags", {
 export const accountsTable = sqliteTable("accounts", {
   id: text().notNull().primaryKey(),
   username: text().notNull(),
-  createdAt: int().notNull(),
-  passkeyChallenge: text(),
+  createdAt: int().notNull()
 });
 
 
@@ -51,10 +50,16 @@ export const passkeysTable = sqliteTable("passkeys", {
   id: text().notNull().references(() => accountsTable.id),
   credId: text().notNull().primaryKey(),
   credPublicKey: blob().notNull(),
-  transports: text().notNull(),
+  transports: text({ mode: "json" }).notNull(),
   counter: int().notNull(),
   deviceType: text().notNull(),
   backedUp: int({ mode: 'boolean' }).notNull(),
   createdAt: int().notNull(),
   lastUsed: int(),
+});
+
+
+export const passkeyChallengesTable = sqliteTable("passkey_challenges", {
+  challenge: text().notNull().primaryKey(),
+  expires: int().notNull(),
 });

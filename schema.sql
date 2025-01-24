@@ -1,19 +1,10 @@
-CREATE TABLE `accounts` (
-	`id` text PRIMARY KEY NOT NULL,
-	`username` text NOT NULL,
-	`createdAt` integer NOT NULL,
-	`passkeyChallenge` text
+PRAGMA foreign_keys=OFF;--> statement-breakpoint
+CREATE TABLE `__new_passkey_challenges` (
+	`challenge` text PRIMARY KEY NOT NULL,
+	`expires` integer NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE `passkeys` (
-	`id` text NOT NULL,
-	`credId` text PRIMARY KEY NOT NULL,
-	`credPublicKey` blob NOT NULL,
-	`transports` text NOT NULL,
-	`counter` integer NOT NULL,
-	`deviceType` text NOT NULL,
-	`backedUp` integer NOT NULL,
-	`createdAt` integer NOT NULL,
-	`lastUsed` integer,
-	FOREIGN KEY (`id`) REFERENCES `accounts`(`id`) ON UPDATE no action ON DELETE no action
-);
+INSERT INTO `__new_passkey_challenges`("challenge", "expires") SELECT "challenge", "expires" FROM `passkey_challenges`;--> statement-breakpoint
+DROP TABLE `passkey_challenges`;--> statement-breakpoint
+ALTER TABLE `__new_passkey_challenges` RENAME TO `passkey_challenges`;--> statement-breakpoint
+PRAGMA foreign_keys=ON;

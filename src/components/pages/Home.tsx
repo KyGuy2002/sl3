@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import ServerCard from '../ServerCard'; // Make sure to import ServerCard
 
 export default function Home() {

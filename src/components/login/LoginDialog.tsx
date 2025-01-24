@@ -1,20 +1,17 @@
-import {
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-  } from "@/components/ui/dialog"
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import { createPasskey } from "./authUtils";
+import { authPasskey, createPasskey } from "./authUtils";
 
 
 
 export default function LoginDialog() {
 
     async function create() {
-        console.log("asd")
         await createPasskey("bob");
+    }
+
+    async function login() {
+        await authPasskey();
     }
 
     return (
@@ -23,7 +20,10 @@ export default function LoginDialog() {
             <form onSubmit={(e) => e.preventDefault()}>
                 <p className="text-3xl font-semibold">Existing User</p>
                 <p className="text-[15px] text-gray-500 font-[400]">Login with your passkey to continue.</p>
-                <Button className="mt-3 w-full"><img src="/icons/passkey.svg" className='h-4 passkey-white'/>  Login with Passkey</Button>
+                <Button className="mt-3 w-full"><img src="/icons/passkey.svg" className='h-4 passkey-white'
+                    onClick={login}/>  Login with Passkey</Button>
+
+<button onClick={login}>login</button>
 
 
 
