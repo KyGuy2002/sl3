@@ -2,12 +2,13 @@ import { useState, useEffect } from 'react';
 import ServerCard from '../ServerCard'; // Make sure to import ServerCard
 import { ChevronRight, Search, SearchIcon, X } from 'lucide-react';
 import { Card, CardDescription, CardTitle } from '../ui/card';
-import TagCard, { getColorClass, type TagType } from '../TagCard';
+import TagCard, { getColorClass, getLighterColorClass, type TagType } from '../TagCard';
 import { Input } from '../ui/input';
 import { Badge } from '../ui/badge';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@radix-ui/react-hover-card';
 import TagCardContent from '../TagCard';
 import { Button } from '../ui/button';
+import classNames from 'classnames';
 
 export default function FilterPage() {
 
@@ -52,11 +53,11 @@ export default function FilterPage() {
 
             <HoverCard>
               <HoverCardTrigger>
-                <div className={'flex items-center gap-0.5 rounded-full w-max px-4 py-0.5 border border-gray-400 ' + getColorClass(item.type)}>
+                <div className={'flex items-center gap-0.5 rounded-full w-max px-4 py-0.5 border border-gray-400 bg-' + getColorClass(item.type)}>
                   {/* Removes the tag */}
-                  <X size={18} strokeWidth={1.5} className='-ml-[6px] cursor-pointer hover:stroke-[2.5px]'
-                    onClick={() => setSelected(selected.filter(i => i !== item))}/>
                   <p className='mb-[2px]'>{item.name}</p>
+                  <X size={18} strokeWidth={1.5} className='-mr-[6px] cursor-pointer hover:stroke-[2.5px]'
+                    onClick={() => remove(item)}/>
                 </div>
               </HoverCardTrigger>
               <HoverCardContent>
@@ -83,8 +84,10 @@ export default function FilterPage() {
 
         <div className="flex flex-wrap gap-2">
           {data && data.map((item: any) => (
-            <Card className='px-4 py-2 cursor-pointer hover:bg-gray-50 border-2 border-transparent hover:border-gray-400 grow flex flex-col justify-between'
-              onClick={() => setSelected([...selected, item])}  >
+            <Card className={classNames('px-4 py-2 cursor-pointer hover:bg-gray-50 border-2 border-transparent hover:border-gray-400 grow flex flex-col justify-between', {
+              [`bg-${getLighterColorClass(item.type)} border-${getColorClass(item.type)}`]: selected.includes(item)
+            })}
+              onClick={() => select(item)}>
               <TagCard key={item.id} data={item}/>
             </Card>
           ))}
@@ -94,10 +97,24 @@ export default function FilterPage() {
 
 
 
-      <Button className='bg-green-600 sticky bottom-5'>Next Step <ChevronRight/></Button>
+      <Button className='bg-green-600 fixed bottom-5 mx-auto inset-x-[500px]'>Next Step <ChevronRight/></Button>
 
       
 
     </div>
   )
+
+
+  function select(item: TagType) {
+    setSelected([...selected, item]);
+
+
+  }
+
+
+  function remove(item: TagType) {
+    setSelected(selected.filter(i => i !== item));
+  }
+
+
 }

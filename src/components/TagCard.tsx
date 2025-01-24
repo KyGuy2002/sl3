@@ -10,7 +10,7 @@ export default function TagCardContent(props: { data: TagType }) {
             <div>
                 <div className='flex items-center gap-2 mt-1 mb-0.5'>
                     <CardTitle>{props.data.name}</CardTitle>
-                    <div className={'rounded-full px-[8px] text-[11px] font-bold uppercase w-max flex items-center gap-[2px] ' + getColorClass(props.data.type)}>
+                    <div className={'rounded-full px-[8px] text-[11px] font-bold uppercase w-max flex items-center gap-[2px] bg-' + getColorClass(props.data.type)}>
                         {props.data.type}
                     </div>
                 </div>
@@ -27,11 +27,23 @@ export default function TagCardContent(props: { data: TagType }) {
 export function getColorClass(type: string) {
     switch (type) {
         case 'PLUGIN':
-            return 'bg-blue-200';
+            return 'blue-200';
         case 'STYLE':
-            return 'bg-purple-300';
+            return 'purple-300';
         default:
-            return 'bg-gray-300';
+            return 'gray-300';
+    }
+}
+
+
+export function getLighterColorClass(type: string) {
+    switch (type) {
+        case 'PLUGIN':
+            return 'blue-100';
+        case 'STYLE':
+            return 'purple-100';
+        default:
+            return 'gray-200';
     }
 }
 
