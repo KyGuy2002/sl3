@@ -1,5 +1,13 @@
 import type { ServerCardDetails } from "@/pages/api/search";
 import { Card } from "@/components/ui/card";
+import {
+    HoverCard,
+    HoverCardContent,
+    HoverCardTrigger,
+} from "@/components/ui/hover-card"
+import TagCardContent from "./TagCard";
+import { Blocks, Copy, SwatchBook } from "lucide-react";
+  
 
 export default function ServerCard(props: { data: ServerCardDetails }) {
     return (
@@ -11,10 +19,14 @@ export default function ServerCard(props: { data: ServerCardDetails }) {
 
                     <div className='m-0'>
 
-                        <p className='font-bold text-lg m-0'>{props.data.name}</p>
-                        <p className='text-gray-500 m-0'>{props.data.ip}</p>
+                        <p className='font-bold text-[19px] m-0'>{props.data.name}</p>
+                        <p className='group hover:gap-4 transition-transform ease-linear duration-200 text-gray-500 m-0 text-[14.5px] -mt-1.5 flex items-center gap-1.5 border-b-transparent border-b-[1px] h-4 hover:border-b-gray-400'>
+                            {props.data.ip}
+                            {/* TODO better hover and click animation */}
+                            <Copy size={11} className="-mb-1 group-hover:scale-125" />
+                        </p>
 
-                        <div className='bg-green-600 w-[60px] h-[3.5px] m-0'/>
+                        <div className='bg-green-600 w-[60px] h-[3px] mt-[3px]'/>
 
                     </div>
 
@@ -27,11 +39,30 @@ export default function ServerCard(props: { data: ServerCardDetails }) {
 
                     <div className='grid grid-cols-2 gap-1'>
                         {props.data.tags.slice(0, 6).map((tag) => (
-                            <p key={tag}>X {tag}</p>
+
+                            <HoverCard>
+                                {/* TODO remove capitalize style */}
+                                <HoverCardTrigger><p key={tag} className="flex font-semibold text-gray-700 items-center gap-1 capitalize">{getIcon("STYLE")} {tag}</p></HoverCardTrigger>
+                                <HoverCardContent>
+                                    <TagCardContent data={JSON.parse('{"id":"01949634-5616-77e0-be7a-912c4d9d94f1","name":"WorldEdit","desc":"An easy-to-use in-game world editor.","modeId":"01949633-064a-76ed-872d-5c531080990a","type":"PLUGIN","aka":["FAWE","WE","Editor"]}')}/>
+                                </HoverCardContent>
+                            </HoverCard>
                         ))}
                     </div>
                 </div>
             </Card>
         </a>
     );
+}
+
+
+function getIcon(type: string) {
+    switch (type) {
+        case 'PLUGIN':
+            return <Blocks size={12} className="-ml-[2px] mb-[1px]"/>;
+        case 'STYLE':
+            return <SwatchBook size={12} className="-ml-[2px]"/>;
+        default:
+            return <Blocks size={15} />;
+    }
 }

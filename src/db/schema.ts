@@ -1,4 +1,4 @@
-import { int, sqliteTable, text, primaryKey, blob } from "drizzle-orm/sqlite-core";
+import { int, sqliteTable, text, primaryKey, blob, uniqueKeyName, unique } from "drizzle-orm/sqlite-core";
 
 export const serversTable = sqliteTable("servers", {
   id: text().notNull().primaryKey(),
@@ -28,14 +28,24 @@ export const modesTable = sqliteTable("server_modes", {
 
 
 export const allTagsTable = sqliteTable("all_tags", {
+  id: text().notNull().primaryKey(),
   name: text().notNull(),
-  tooltipDesc: text().notNull(),
-  mode: text(),
-  isMode: int({ mode: 'boolean' }).notNull(),
+  desc: text().notNull(),
+  modeId: text().notNull().references(() => allModesTable.id),
+  type: text().notNull(),
+  aka: text({ mode: "json" }).notNull(),
 }, (table) => {
   return {
-    pk: primaryKey({ columns: [table.name, table.mode] })
+    uk: unique("name-mode").on(table.name, table.modeId)
   };
+});
+
+
+export const allModesTable = sqliteTable("all_modes", {
+  id: text().notNull().primaryKey(),
+  name: text().notNull().unique(),
+  desc: text().notNull(),
+  aka: text({ mode: "json" }).notNull(),
 });
 
 
