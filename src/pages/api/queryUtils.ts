@@ -1,43 +1,41 @@
-import { allModesTable, allTagsTable, embedCache, serversTable } from "@/db/schema";
-import type { APIContext } from "astro";
-import { eq, min, or } from "drizzle-orm";
+import { allModesTable, allTagsTable, embedCache } from "@/db/schema";
+import { eq, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
 
 
-export async function GET({ params, request, locals }: APIContext) {
+export async function runQuery(env: any, type: "tags" | "modes", query: string, modeId?: string) {
+    if (type == "tags" && modeId == undefined) throw new Error("modeId is required for tags");
 
-    const query = new URL(request.url).searchParams.get("q");
-    if (query === null) return new Response("No query provided", { status: 400 });
-    const modeId = new URL(request.url).searchParams.get("modeId");
-    if (modeId === null) return new Response("No modeId provided", { status: 400 });
+    const VEC_TABLE = type == "tags" ? env.VEC_TAGS : env.VEC_MODES;
+    const DB_TABLE = type == "tags" ? allTagsTable : allModesTable;
 
 
     // Get embedding
     let embedTs = Date.now();
-    const { vector, cached } = await getOrGenEmbed(query, modeId, locals.runtime.env);
+    const { vector, cached } = await getOrGenEmbed(env, query, modeId);
     embedTs = Date.now() - embedTs;
 
 
     // Find matches in db
     let vecTs = Date.now();
-    const nearest = await locals.runtime.env.VEC_TAGS.query(
+    const nearest = await VEC_TABLE.query(
         vector,
         {
             topK: 25,
             returnValues: false,
-            namespace: modeId
+            namespace: modeId // Is undefined if modes, so wont filter at all
         }
     )
     vecTs = Date.now() - vecTs;
 
 
-    const q: any[] = nearest.matches.map((match: any) => eq(allTagsTable.id, match.id));
+    const q: any[] = nearest.matches.map((match: any) => eq(DB_TABLE.id, match.id));
 
     // Get full data
     let dataTs = Date.now();
-    const res = await drizzle(locals.runtime.env.DB)
+    const res = await drizzle(env.DB)
         .select()
-        .from(allTagsTable)
+        .from(DB_TABLE)
         .where(
             or(...q)
         );
@@ -95,7 +93,7 @@ export async function GET({ params, request, locals }: APIContext) {
         final.maybeItems = [];
     }
 
-    return new Response(JSON.stringify({
+    return {
         ...final,
         count: res2.length,
         times: {
@@ -105,38 +103,15 @@ export async function GET({ params, request, locals }: APIContext) {
             total: embedTs + vecTs + dataTs
         },
         cached: cached
-    }));
-
-
-  
-    // // Calculate the threshold for "best" items (90% of the max score)
-    // const threshold = maxScore * 0.85;
-    
-    // // Separate items into "best" and "maybe" arrays based on the threshold
-    // const bestItems = res2.filter(item => item.score >= threshold);
-    // const maybeItems = res2.filter(item => item.score < threshold); 
-
-    // console.log((cached ? "Cached" : "Fresh"), "- Time: " + (embedTs + vecTs + dataTs) / 1000 + "s");
-    // return new Response(JSON.stringify({
-    //     items: (bestItems.length <= 5 ? bestItems : res2), // Only group if 5 or less best, otherwise it is kinda meaningless
-    //     otherItems: (bestItems.length <= 5 ? maybeItems : []),
-    //     badResults: (maxScore - minScore < 0.15),
-    //     times: {
-    //         embed: embedTs,
-    //         vec: vecTs,
-    //         data: dataTs,
-    //         total: embedTs + vecTs + dataTs
-    //     },
-    //     cached: cached
-    // }));
+    };
 
 }
 
 
 
-async function getOrGenEmbed(query: string, modeId: string, env: any) {
+async function getOrGenEmbed(env: any, query: string, modeId?: string) {
 
-    const hash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(modeId + query));
+    const hash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode((modeId ? modeId + query : "ismode" + query)));
 
     const hRes = await drizzle(env.DB)
         .select()

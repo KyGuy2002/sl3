@@ -31,18 +31,22 @@ export function getColorConditions(type: string, light: boolean = false) {
         'bg-blue-100': type === 'PLUGIN',
         'bg-purple-100': type === 'STYLE',
         'bg-green-100': type === 'FEATURE',
+        'bg-red-100': type === 'TOOL',
         'bg-gray-100': type === 'OTHER',
     }
     else return {
         'bg-blue-200': type === 'PLUGIN',
         'bg-purple-300': type === 'STYLE',
         'bg-green-300': type === 'FEATURE',
+        'bg-red-300': type === 'TOOL',
         'bg-gray-300': type === 'OTHER',
     }
 }
 
 
 export type TagType = {
+    id: string,
+    score: string,
     name: string,
     desc: string,
     type: string,

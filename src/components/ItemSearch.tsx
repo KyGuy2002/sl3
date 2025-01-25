@@ -35,16 +35,13 @@ export default function ItemSearch(props: {
   }, [])
 
 
-  const [selected, setSelected] = useState<TagType[]>([]);
-
-
   return (
     <div className='p-4 mt-10 mx-20'>
 
 
         <div className='mb-3 flex gap-2'>
 
-          {selected.map((item) => (
+          {props.selected.map((item) => (
 
             <HoverCard>
               <HoverCardTrigger>
@@ -129,7 +126,7 @@ export default function ItemSearch(props: {
         return;
     }
 
-    setSelected([...selected, item]);
+    props.setSelected([...props.selected, item]);
 
     // Make user select all text in field (faster to restart typing)
     inputRef.current?.select();
@@ -137,7 +134,7 @@ export default function ItemSearch(props: {
 
 
   function remove(item: TagType) {
-    setSelected(selected.filter(i => i !== item));
+    props.setSelected(props.selected.filter(i => i !== item));
   }
 
 
@@ -161,7 +158,7 @@ export default function ItemSearch(props: {
 
     let response;
     try {
-      response = await fetch('/api/query?q=' + q + "&modeId=01949633-064a-76ed-872d-5c531080990a", { signal });
+      response = await fetch(props.queryEndpoint + q, { signal });
     } catch (error: any) {
       if (error.name === 'AbortError') return;
       console.log(error)
@@ -173,17 +170,17 @@ export default function ItemSearch(props: {
   }
 
 
-  function FilterFlex(props: { items: any, highlight: boolean, gray: boolean, onClick: (item: any) => void }) {
+  function FilterFlex(localProps: { items: any, highlight: boolean, gray: boolean, onClick: (item: any) => void }) {
     return (
       <div className="flex flex-wrap gap-2">
-        {props.items.map((item: any) => (
+        {localProps.items.map((item: any) => (
           <Card className={classNames('relative px-4 py-2 cursor-pointer hover:bg-gray-50 border-2 border-transparent hover:border-gray-400 grow flex flex-col justify-between', {
-              'opacity-[0.7]': props.gray,
-              'outline outline-1 outline-gray-700': props.highlight,
+              'opacity-[0.7]': localProps.gray,
+              'outline outline-1 outline-gray-700': localProps.highlight,
               'outline outline-[3.5px] outline-gray-400': getFirstItem() === item && data != defData,
-              ...(selected.includes(item) ? getColorConditions(item.type, true) : {})
+              ...(props.selected.includes(item) ? getColorConditions(item.type, true) : {})
             })}
-            onClick={() => props.onClick(item)}
+            onClick={() => localProps.onClick(item)}
           >
             <TagCardContent key={item.id} data={item}/>
 

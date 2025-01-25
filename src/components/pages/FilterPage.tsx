@@ -1,16 +1,13 @@
-import { useState, useEffect, useRef } from 'react';
-import { ArrowBigRight, ChevronRight, Search, SearchIcon, X } from 'lucide-react';
-import { Card } from '../ui/card';
-import TagCard, { getColorConditions, type TagType } from '../TagCardContent';
-import { HoverCard, HoverCardContent, HoverCardTrigger } from '@radix-ui/react-hover-card';
-import TagCardContent from '../TagCardContent';
+import { useState } from 'react';
+import { ChevronRight, Search } from 'lucide-react';
+import { type TagType } from '../TagCardContent';
 import { Button } from '../ui/button';
-import classNames from 'classnames';
 import ItemSearch from '../ItemSearch';
 
 export default function FilterPage() {
 
-  const [selected, setSelected] = useState<TagType[]>([]);
+  const [selectedTags, setSelectedTags] = useState<TagType[]>([]);
+  const [selectedGamemode, setSelectedGamemode] = useState<TagType>();
 
   return (
     <div className="bg-gray-200 p-4 min-h-full">
@@ -28,21 +25,75 @@ export default function FilterPage() {
         of Servers
       </h1>
 
+      {!selectedGamemode && <GamemodeSection />}
 
-      <ItemSearch
-        selected={selected}
-        setSelected={setSelected}
-        defaultEndpoint='/api/tags?modeId=01949633-064a-76ed-872d-5c531080990a'
-      />
-
-
-
-      <Button className='bg-green-600 fixed bottom-5 mx-auto inset-x-[500px]'>Next Step <ChevronRight/></Button>
+      {selectedGamemode && <TagsSection />}
 
       
 
     </div>
   )
+
+
+
+
+  function GamemodeSection() {
+    return (
+      <div>
+
+
+        <h1>Step 1: Select Gamemode</h1>
+        <p>Minecraft allows infinitely many unique gamemodes and play styles.  Start by picking which one you're looking for.</p>
+  
+  
+        <ItemSearch
+          selected={[]}
+          setSelected={() => {}}
+          onSelectOne={g => setSelectedGamemode(g)}
+          defaultEndpoint={`/api/filters/modes`}
+          queryEndpoint={`/api/filters/modes/query?q=`}
+        />
+  
+  
+      </div>
+    )
+  }
+
+
+  function TagsSection() {
+    return (
+      <div>
+
+
+        <h1>Step 2: Pick Features</h1>
+        <p>Plugins, gameplay styles, features, and everything in between.  Please select all the tags you want to search for.</p>
+  
+  
+        <ItemSearch
+          selected={selectedTags}
+          setSelected={setSelectedTags}
+          defaultEndpoint={`/api/filters/tags?modeId=${selectedGamemode!.id}`}
+          queryEndpoint={`/api/filters/tags/query?modeId=${selectedGamemode!.id}&q=`}
+        />
+
+
+        <div className='fixed bottom-5 mx-auto inset-x-[500px]'>
+          <Button variant="secondary" onClick={() => {
+            setSelectedGamemode(undefined);
+            setSelectedTags([]);
+          }}>Start Over</Button>
+          <Button className='bg-green-600'>Next Step <ChevronRight/></Button>
+        </div>
+  
+  
+      </div>
+    )
+  }
+
+
+
+
+
 
 
 }

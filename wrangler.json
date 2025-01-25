@@ -20,16 +20,12 @@
 
   "vectorize": [
     {
-      "binding": "VEC_GAMEMODES",
-      "index_name": "gamemodes-index"
-    },
-    {
-      "binding": "VEC_SERVER",
-      "index_name": "servers-index"
+      "binding": "VEC_MODES",
+      "index_name": "sl2-modes-index"
     },
     {
       "binding": "VEC_TAGS",
-      "index_name": "tags-index"
+      "index_name": "sl2-tags-index"
     }
   ],
   
