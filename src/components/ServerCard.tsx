@@ -5,7 +5,7 @@ import {
     HoverCardContent,
     HoverCardTrigger,
 } from "@/components/ui/hover-card"
-import TagCardContent from "./TagCard";
+import TagCardContent from "./TagCardContent";
 import { Blocks, Copy, SwatchBook } from "lucide-react";
   
 

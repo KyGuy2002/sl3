@@ -16,5 +16,25 @@
       "database_name": "sl2",
       "database_id": "6ac7fa6c-5010-4144-9b28-f41472d67730"
     }
-  ]
+  ],
+
+  "vectorize": [
+    {
+      "binding": "VEC_GAMEMODES",
+      "index_name": "gamemodes-index"
+    },
+    {
+      "binding": "VEC_SERVER",
+      "index_name": "servers-index"
+    },
+    {
+      "binding": "VEC_TAGS",
+      "index_name": "tags-index"
+    }
+  ],
+  
+
+  "ai": {
+    "binding": "AI"
+  }
 }

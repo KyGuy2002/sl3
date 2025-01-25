@@ -1,4 +1,5 @@
 import { CardDescription, CardTitle } from "@/components/ui/card";
+import classNames from "classnames";
 import cx from 'classnames';
 import { Blocks, SwatchBook } from "lucide-react";
 
@@ -10,9 +11,10 @@ export default function TagCardContent(props: { data: TagType }) {
             <div>
                 <div className='flex items-center gap-2 mt-1 mb-0.5'>
                     <CardTitle>{props.data.name}</CardTitle>
-                    <div className={'rounded-full px-[8px] text-[11px] font-bold uppercase w-max flex items-center gap-[2px] bg-' + getColorClass(props.data.type)}>
+                    <div className={classNames(`rounded-full px-[8px] text-[11px] font-bold uppercase w-max flex items-center gap-[2px]`, getColorConditions(props.data.type))}>
                         {props.data.type}
                     </div>
+                    {props.data.score && <p className="ml-auto text-xs text-gray-500">{Math.round(props.data.score.toFixed(2) * 100)}%</p>}
                 </div>
 
                 <CardDescription className='text-[15px]'>{props.data.desc}</CardDescription>
@@ -24,26 +26,18 @@ export default function TagCardContent(props: { data: TagType }) {
 }
 
 
-export function getColorClass(type: string) {
-    switch (type) {
-        case 'PLUGIN':
-            return 'blue-200';
-        case 'STYLE':
-            return 'purple-300';
-        default:
-            return 'gray-300';
+export function getColorConditions(type: string, light: boolean = false) {
+    if (light) return {
+        'bg-blue-100': type === 'PLUGIN',
+        'bg-purple-100': type === 'STYLE',
+        'bg-green-100': type === 'FEATURE',
+        'bg-gray-100': type === 'OTHER',
     }
-}
-
-
-export function getLighterColorClass(type: string) {
-    switch (type) {
-        case 'PLUGIN':
-            return 'blue-100';
-        case 'STYLE':
-            return 'purple-100';
-        default:
-            return 'gray-200';
+    else return {
+        'bg-blue-200': type === 'PLUGIN',
+        'bg-purple-300': type === 'STYLE',
+        'bg-green-300': type === 'FEATURE',
+        'bg-gray-300': type === 'OTHER',
     }
 }
 

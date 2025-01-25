@@ -2,7 +2,7 @@ import { int, sqliteTable, text, primaryKey, blob, uniqueKeyName, unique } from 
 
 export const serversTable = sqliteTable("servers", {
   id: text().notNull().primaryKey(),
-  name: text().notNull(),
+  name: text().notNull().unique(),
   desc: text().notNull(),
   ip: text().notNull(),
   onlinePlayers: int().notNull(),
@@ -72,4 +72,10 @@ export const passkeysTable = sqliteTable("passkeys", {
 export const passkeyChallengesTable = sqliteTable("passkey_challenges", {
   challenge: text().notNull().primaryKey(),
   expires: int().notNull(),
+});
+
+
+export const embedCache = sqliteTable("embed_cache", {
+  hash: text().notNull().primaryKey(),
+  vector: text({ mode: "json" }).notNull(),
 });
