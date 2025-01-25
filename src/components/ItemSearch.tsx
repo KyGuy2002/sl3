@@ -11,6 +11,7 @@ export default function ItemSearch(props: {
     setSelected: (items: TagType[]) => void,
     defaultEndpoint: string,
     queryEndpoint: string,
+    placeholder: string,
 }) {
 
   const abortRef = useRef<AbortController>(null);
@@ -70,7 +71,7 @@ export default function ItemSearch(props: {
 
               {loading && <img src="/icons/spinner.svg" className='h-[18px] w-[17.5px]'/>}
 
-              <input ref={inputRef} placeholder='Search for a Gamemode' autoFocus className='focus:outline-transparent w-full text-black'
+              <input ref={inputRef} placeholder={props.placeholder} autoFocus className='focus:outline-transparent w-full text-black'
                 onChange={searchChange}
                 onKeyDown={(e) => e.key === 'Enter' && select(getFirstItem())}
               />

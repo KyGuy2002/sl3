@@ -43,7 +43,7 @@ export default function FilterPage() {
 
 
         <h1 className='text-4xl font-bold'>Step 1: Select Gamemode</h1>
-        <p className='text-2xl max-w-3xl'>Minecraft allows infinitely many unique gamemodes and play styles.  Start by picking which one you're looking for.</p>
+        <p className='text-2xl max-w-3xl mb-6'>Minecraft allows infinitely many unique gamemodes and play styles.  Start by picking which one you're looking for.</p>
   
   
         <ItemSearch
@@ -52,6 +52,7 @@ export default function FilterPage() {
           onSelectOne={g => setSelectedGamemode(g)}
           defaultEndpoint={`/api/filters/modes`}
           queryEndpoint={`/api/filters/modes/query?q=`}
+          placeholder='Search for a gamemode'
         />
   
   
@@ -65,8 +66,8 @@ export default function FilterPage() {
       <div>
 
 
-        <h1>Step 2: Pick Features</h1>
-        <p>Plugins, gameplay styles, features, and everything in between.  Please select all the tags you want to search for.</p>
+        <h1 className='text-4xl font-bold'>Step 2: Pick Features</h1>
+        <p className='text-2xl max-w-3xl mb-6'>Plugins, gameplay styles, features, and everything in between.  Please select all the tags you want to search for.</p>
   
   
         <ItemSearch
@@ -74,6 +75,7 @@ export default function FilterPage() {
           setSelected={setSelectedTags}
           defaultEndpoint={`/api/filters/tags?modeId=${selectedGamemode!.id}`}
           queryEndpoint={`/api/filters/tags/query?modeId=${selectedGamemode!.id}&q=`}
+          placeholder='Search for a tag'
         />
 
 
