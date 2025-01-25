@@ -10,7 +10,7 @@ export default function FilterPage() {
   const [selectedGamemode, setSelectedGamemode] = useState<TagType>();
 
   return (
-    <div className="bg-gray-200 p-4 min-h-full">
+    <div className="bg-gray-200 p-4 min-h-full font-[prompt] px-20">
       
       <h1 className='text-5xl font-extrabold mt-14 flex items-center justify-center'>
         
@@ -42,8 +42,8 @@ export default function FilterPage() {
       <div>
 
 
-        <h1>Step 1: Select Gamemode</h1>
-        <p>Minecraft allows infinitely many unique gamemodes and play styles.  Start by picking which one you're looking for.</p>
+        <h1 className='text-4xl font-bold'>Step 1: Select Gamemode</h1>
+        <p className='text-2xl max-w-3xl'>Minecraft allows infinitely many unique gamemodes and play styles.  Start by picking which one you're looking for.</p>
   
   
         <ItemSearch

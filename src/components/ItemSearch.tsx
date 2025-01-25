@@ -36,7 +36,7 @@ export default function ItemSearch(props: {
 
 
   return (
-    <div className='p-4 mt-10 mx-20'>
+    <div>
 
 
         <div className='mb-3 flex gap-2'>
