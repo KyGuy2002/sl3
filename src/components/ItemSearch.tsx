@@ -18,6 +18,7 @@ export default function ItemSearch(props: {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [data, setData] = useState<any>();
+  const [typeahead, setTypeahead] = useState<any>();
   const [defData, setDefData] = useState<any>();
 
   const [loading, setLoading] = useState(true);
@@ -34,6 +35,19 @@ export default function ItemSearch(props: {
     abortRef.current = new AbortController();
     load();
   }, [])
+
+  useEffect(() => {
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab' && typeahead) {
+        e.preventDefault();
+        if (!inputRef.current) return;
+        inputRef.current.value = typeahead;
+        setTypeahead(undefined);
+      }
+    });
+
+  });
 
 
   return (
@@ -77,9 +91,16 @@ export default function ItemSearch(props: {
                   onKeyDown={(e) => e.key === 'Enter' && select(getFirstItem())}
                 />
 
-                <div className='absolute top-0'>
-                  <span>wor</span>
-                  ldedit
+                <div className='absolute top-0 text-gray-400 flex items-center'>
+                  <span className='opacity-0'>{inputRef.current?.value}</span>
+                  {typeahead?.slice(inputRef.current?.value.length)}
+                  {typeahead && <p
+                    className='bg-gray-400 rounded-md text-[10px] font-bold text-white px-[5px] py-0.5
+                    flex items-center gap-[0.5px] pr-[2.5px] w-max ml-1'
+                  >
+                    TAB
+                    <ArrowBigRight size={15} strokeWidth={2.2}/>  
+                  </p>}
                 </div>
               </div>
 
@@ -149,19 +170,43 @@ export default function ItemSearch(props: {
 
     if (!e.target.value || e.target.value === '' || e.target.value === ' ' || e.target.value.length == 0) {
       setData(defData);
+      setTypeahead(undefined);
       return;
     }
 
+    // if (!typeahead.toLowerCase().startsWith(e.target.value.toLowerCase())) setTypeahead(undefined);
+
     abortRef.current?.abort();
-    query(e.target.value);
-  }
-
-
-  async function query(q: string) {
-    setLoading(true);
 
     abortRef.current = new AbortController();
     const signal = abortRef.current?.signal;
+
+    query(e.target.value, signal);
+    queryTypeahead(e.target.value, signal);
+  }
+
+
+  async function queryTypeahead(q: string, signal: AbortSignal) {
+
+    let response;
+    try {
+      response = await fetch('/api/filters/modes/typeahead?q=' + q, { signal });
+    } catch (error: any) {
+      if (error.name === 'AbortError') return;
+      console.log(error)
+      return;
+    }
+
+    let t = await response.text();
+    if (!t) return;
+
+    t = t.replaceAll('"', '')
+    setTypeahead(t);
+  }
+
+
+  async function query(q: string, signal: AbortSignal) {
+    setLoading(true);
 
     let response;
     try {

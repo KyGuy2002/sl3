@@ -7,12 +7,28 @@ export async function runTypeaheadFtsQuery(env: any, type: "tags" | "modes", que
     if (type == "tags" && modeId == undefined) throw new Error("modeId is required for tags");
     const DB_TABLE = type == "tags" ? "all_tags_fts" : "all_modes_fts";
 
-    query = "name:^" + query + "*";
+    let newQuery = query.replace(" ", " + ");
+    newQuery = `name:^${newQuery}* OR aka:${newQuery}*`;
 
     // Start of name match
-    const res = await env.DB.prepare(`SELECT name, bm25(${DB_TABLE},3,1,2) as bm25, snippet(${DB_TABLE}, -1, '', '', '',32) FROM ${DB_TABLE} WHERE ${DB_TABLE} MATCH ? AND bm25 < 0 ORDER BY bm25 LIMIT 1`).bind(query).run();
+    let res = await env.DB.prepare(`SELECT *, bm25(${DB_TABLE},3,1,2) as bm25, snippet(${DB_TABLE}, -1, '', '', '',32) FROM ${DB_TABLE} WHERE ${DB_TABLE} MATCH ? AND bm25 < 0 ORDER BY bm25 LIMIT 1`).bind(newQuery).run();
+    res = res.results[0];
+    if (!res) return undefined;
 
-    return res.results[0];
+    const lastKey: string = Object.keys(res)[Object.keys(res).length - 1];
+    let value = res[lastKey];
+
+    if (res.aka == value) {
+        const json = JSON.parse(value);
+        json.forEach((element: any) => {
+            console.log(element, query)
+            if (!element.toLowerCase().startsWith(query.toLowerCase())) return;
+            console.log("Found aka!: " + element)
+            value = element;
+        });
+    }
+
+    return value;
 }
 
 
