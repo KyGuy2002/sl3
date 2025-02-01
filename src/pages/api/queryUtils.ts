@@ -3,6 +3,30 @@ import { eq, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
 
 
+export async function runTypeaheadFtsQuery(env: any, type: "tags" | "modes", query: string, modeId?: string) {
+    if (type == "tags" && modeId == undefined) throw new Error("modeId is required for tags");
+    const DB_TABLE = type == "tags" ? "all_tags_fts" : "all_modes_fts";
+
+    query = "name:^" + query + "*";
+
+    // Start of name match
+    const res = await env.DB.prepare(`SELECT name, bm25(${DB_TABLE},3,1,2) as bm25, snippet(${DB_TABLE}, -1, '', '', '',32) FROM ${DB_TABLE} WHERE ${DB_TABLE} MATCH ? AND bm25 < 0 ORDER BY bm25 LIMIT 1`).bind(query).run();
+
+    return res.results[0];
+}
+
+
+export async function runFtsQuery(env: any, type: "tags" | "modes", query: string, modeId?: string) {
+    if (type == "tags" && modeId == undefined) throw new Error("modeId is required for tags");
+    const DB_TABLE = type == "tags" ? "all_tags_fts" : "all_modes_fts";
+
+    // Exact match.  Rank: name, aka, desc (name most important)
+    const res = await env.DB.prepare(`SELECT *, bm25(${DB_TABLE},3,1,2) as bm25 FROM ${DB_TABLE} WHERE ${DB_TABLE} MATCH ? AND bm25 < 0 ORDER BY bm25`).bind(query).run();
+
+    return res.results;
+}
+
+
 export async function runQuery(env: any, type: "tags" | "modes", query: string, modeId?: string) {
     if (type == "tags" && modeId == undefined) throw new Error("modeId is required for tags");
 

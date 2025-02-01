@@ -1,4 +1,4 @@
-import type { ServerCardDetails } from "@/pages/api/search";
+import type { ServerCardDetails } from "@/pages/api/server/search";
 import { Card } from "@/components/ui/card";
 import {
     HoverCard,

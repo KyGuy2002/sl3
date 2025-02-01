@@ -71,10 +71,17 @@ export default function ItemSearch(props: {
 
               {loading && <img src="/icons/spinner.svg" className='h-[18px] w-[17.5px]'/>}
 
-              <input ref={inputRef} placeholder={props.placeholder} autoFocus className='focus:outline-transparent w-full text-black'
-                onChange={searchChange}
-                onKeyDown={(e) => e.key === 'Enter' && select(getFirstItem())}
-              />
+              <div className='w-full relative'>
+                <input ref={inputRef} placeholder={props.placeholder} autoFocus className='focus:outline-transparent w-full text-black'
+                  onChange={searchChange}
+                  onKeyDown={(e) => e.key === 'Enter' && select(getFirstItem())}
+                />
+
+                <div className='absolute top-0'>
+                  <span>wor</span>
+                  ldedit
+                </div>
+              </div>
 
             </Card>
           </div>
@@ -119,7 +126,6 @@ export default function ItemSearch(props: {
 
 
   function select(item: TagType) {
-    console.log("ee")
     if (!item) return;
 
     if (props.onSelectOne) {

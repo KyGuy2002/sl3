@@ -9,7 +9,8 @@
     "astro": "astro",
     "find-local-db": "find .wrangler/state/v3/d1/miniflare-D1DatabaseObject -type f -name '*.sqlite' -print -quit",
     "db:update": "npx drizzle-kit generate | tee output.log | grep -q 'No schema changes' && echo '=== No changes!' && exit 0; cat ./drizzle/$(ls ./drizzle | tail -2 | head -1) > schema.sql; npx wrangler d1 execute DB --file 'schema.sql'",
-    "db:studio": "npx drizzle-kit studio"
+    "db:studio": "npx drizzle-kit studio",
+    "db:run": "npx wrangler d1 execute DB --file 'schema.sql'"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^12.2.1",
