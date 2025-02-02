@@ -6,7 +6,7 @@ export default function Home() {
   const [data, setData] = useState<{}[]>();
 
   async function load() {
-    const response = await fetch('/api/server/search?mode=creative&tags=npc');
+    const response = await fetch('/api/server/all');
     setData(await response.json());
   }
 

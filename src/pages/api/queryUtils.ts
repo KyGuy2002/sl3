@@ -33,11 +33,12 @@ export async function runTypeaheadFtsQuery(env: any, type: "tags" | "modes", que
 
 
 export async function runFtsQuery(env: any, type: "tags" | "modes", query: string, modeId?: string) {
-    if (type == "tags" && modeId == undefined) throw new Error("modeId is required for tags");
     const DB_TABLE = type == "tags" ? "all_tags_fts" : "all_modes_fts";
 
     // Exact match.  Rank: name, aka, desc (name most important)
-    const res = await env.DB.prepare(`SELECT *, bm25(${DB_TABLE},3,1,2) as bm25 FROM ${DB_TABLE} WHERE ${DB_TABLE} MATCH ? AND bm25 < 0 ORDER BY bm25`).bind(query).run();
+    const res = await env.DB.prepare(
+        `SELECT *, bm25(${DB_TABLE},3,1,2) as bm25 FROM ${DB_TABLE} WHERE ${DB_TABLE} MATCH ? AND bm25 < 0 ${(modeId ? `AND modeId = ?` : ``)} ORDER BY bm25`
+    ).bind(query, modeId).run();
 
     return res.results;
 }
@@ -149,7 +150,8 @@ export async function runQuery(env: any, type: "tags" | "modes", query: string, 
 
 
 
-async function getOrGenEmbed(env: any, query: string, modeId?: string) {
+// TODO do we need modeid here?
+export async function getOrGenEmbed(env: any, query: string, modeId?: string) {
 
     const hash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode((modeId ? modeId + query : "ismode" + query)));
 

@@ -11,18 +11,21 @@ export const serversTable = sqliteTable("servers", {
   created: int().notNull(),
   lastUpdated: int().notNull(),
   online: int({ mode: 'boolean' }).notNull(),
+
+  logoUrl: text(),
+  bannerUrl: text(),
 });
 
 
-export const modesTable = sqliteTable("server_modes", {
-  id: text().notNull().references(() => serversTable.id),
-  mode: text().notNull(),
+export const serverModesTable = sqliteTable("server_modes", {
+  serverId: text().notNull().references(() => serversTable.id),
+  modeId: text().notNull().references(() => allModesTable.id),
   tags: text({ mode: "json" }).notNull(),
   cardDesc: text().notNull(),
   fullDesc: text().notNull(),
 }, (table) => {
   return {
-    pk: primaryKey({ columns: [table.id, table.mode] })
+    pk: primaryKey({ columns: [table.serverId, table.modeId] })
   };
 });
 
