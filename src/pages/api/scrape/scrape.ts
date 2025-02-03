@@ -11,16 +11,16 @@ export async function GET({ params, request, locals }: APIContext) {
     // const servers: any = [];
     // const serverModes: any = [];
 
-    const res = await getIdList(0);
-    // res.forEach(async (id: string) => {
+    const no1 = Math.floor(Math.random() * 10);
+    const res = await getIdList(no1);
+    // await res.forEach(async (id: string) => {
     //     const data = await getServerDetails(locals.runtime.env, id);
     //     servers.push(data.details);
     //     serverModes.push(data.modes);
     // });
 
-    console.log(res[0])
-    const data = await getServerDetails(locals.runtime.env, res[0]);
-    console.log(data);
+    const no = Math.floor(Math.random() * (res.length));
+    const data = await getServerDetails(locals.runtime.env, res[no]);
     // servers.push(data.details);
     // serverModes.push(data.modes);
 
@@ -29,6 +29,6 @@ export async function GET({ params, request, locals }: APIContext) {
     // await drizzle(locals.runtime.env.DB).insert(serverModesTable).values(serverModes).execute();
 
 
-    return new Response("Success!");
+    return new Response(JSON.stringify(data));
 
 }

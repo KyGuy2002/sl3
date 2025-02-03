@@ -36,9 +36,15 @@ export async function runFtsQuery(env: any, type: "tags" | "modes", query: strin
     const DB_TABLE = type == "tags" ? "all_tags_fts" : "all_modes_fts";
 
     // Exact match.  Rank: name, aka, desc (name most important)
+    query = query.replaceAll("-", " "); // TODO why is a - breaking it??!?!!!!???!?!!
+    query = query.replaceAll("\"", "");
+    query = query.replaceAll("\'", "");
+    query = query.replaceAll(",", "");
+    query = query.replaceAll(".", "");
+    query = query.replaceAll(" ", " OR ");
     const res = await env.DB.prepare(
-        `SELECT *, bm25(${DB_TABLE},3,1,2) as bm25 FROM ${DB_TABLE} WHERE ${DB_TABLE} MATCH ? AND bm25 < 0 ${(modeId ? `AND modeId = ?` : ``)} ORDER BY bm25`
-    ).bind(query, modeId).run();
+        `SELECT *, bm25(${DB_TABLE},3,1,2) as bm25 FROM ${DB_TABLE} WHERE ${DB_TABLE} MATCH ? ${(modeId ? `AND modeId = ?` : ``)} AND bm25 < 0 ORDER BY bm25`
+    ).bind(query, ...(modeId ? [modeId] : [])).run();
 
     return res.results;
 }

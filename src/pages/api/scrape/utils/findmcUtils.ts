@@ -1,4 +1,7 @@
-import { getMatchingMode, getTagsFromDesc } from "./utils";
+import { drizzle } from "drizzle-orm/d1";
+import { getMatchingMode, getServerShortDesc, getTagsFromDesc } from "./utils";
+import { allTagsTable } from "@/db/schema";
+import { eq, or } from "drizzle-orm";
 
 
 export async function getIdList(page: number): Promise<string[]> {
@@ -26,15 +29,15 @@ export async function getServerDetails(env: any, foreignId: string) {
             id: id,
             name: json.name,
             desc: json.longDescription,
-            logoUrl: json.iconImage.url,
-            bannerUrl: json.featuredImage.url || json.backgroundImage.url,
+            logoUrl: json.iconImage?.url || "",
+            bannerUrl: json.featuredImage?.url || json.backgroundImage?.url || "",
             ip: json.javaAddress,
             onlinePlayers: json.currentOnlinePlayers,
             online: json.isOnline,
             created: new Date(json.launchedOn).getTime(),
             lastUpdated: new Date(json.launchedOn).getTime(),
-            versionStart: json.version[0].name,
-            versionEnd: json.version[0].name, // TODO last one in array?
+            versionStart: json.version[0]?.name || "",
+            versionEnd: json.version[0]?.name || "", // TODO last one in array?
         },
 
         modes: await getGameModes(env, id, json.longDescription, json.serverTags),
@@ -45,10 +48,13 @@ export async function getServerDetails(env: any, foreignId: string) {
 
 
 async function getGameModes(env: any, serverId: string, desc: string, tags: any) {
+    console.log("===== getGameModes")
 
     const serverModes: any = [];
 
-    tags.map(async (t: any) => {
+    // await tags.map(async (t: any) => {
+    await handle(tags[0])
+    async function handle(t: any) {
         if (t.name.startsWith("GAMEMODE-")) t.name = t.name.split("-")[1];
 
         const ourMode = await getMatchingMode(env, t.name, t.description);
@@ -58,16 +64,22 @@ async function getGameModes(env: any, serverId: string, desc: string, tags: any)
         // Get tags
         const tagIds = await getTagsFromDesc(env, ourMode.id, desc, tags.map((t: any) => ({ name: t.name, desc: t.description })));
 
+        // Get name
+        const allOrs = tagIds.map((id: string) => eq(allTagsTable.id, id));
+
+        const res = await drizzle(env.DB).select().from(allTagsTable).where(or(...allOrs)).execute();
+
         
         serverModes.push({
             serverId: serverId,
             modeId: ourMode.id,
-            cardDesc: desc.slice(0, 60), // TODO ai gen this?
+            cardDesc: (await getServerShortDesc(env, desc, ourMode)).replaceAll("\"", " "),
             fullDesc: desc.slice(0, 200), // TODO ai gen this?
-            tags: tagIds,
+            tags: res.map((r: any) => r.name),
         });
 
-    });
+    }
+    // });
 
     return serverModes;
 
