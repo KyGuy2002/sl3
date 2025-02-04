@@ -11,23 +11,23 @@ import { Blocks, Copy, SwatchBook } from "lucide-react";
 
 export default function ServerCard(props: { data: ServerCardDetails }) {
     return (
-        <a href={`/server/${props.data.id}`} className="flex-1 min-w-[300px] max-w-[400px] cursor-pointer hover:scale-[1.008] transition-transform focus:scale-[1.1]">
+        <a href={`/server/${props.data.id}`} className="flex-grow-0 min-w-[300px] cursor-pointer hover:scale-[1.008] transition-transform focus:scale-[1.1]">
             <Card className='h-full hover:bg-gray-50 overflow-hidden'>
 
                 {/* Banner Image */}
                 <div className="h-0">
-                    <div className="w-full h-[60px] relative">
-                        <img src={`/images/temp/1.png`} alt={`${props.data.name} Minecraft Server`}
+                    <div className="w-full h-[100px] relative">
+                        <img src={props.data.bannerUrl} alt={`${props.data.name} Minecraft Server`}
                             className="absolute w-full h-full object-cover object-center"
                         />
                         <div className="absolute w-full h-full" style={{backgroundImage: 'linear-gradient(rgba(0,0,0,0), rgba(255,255,255,1))'}}></div>
                     </div>
                 </div>
 
-                <div className="relative p-[20px] pt-[18px]">
+                <div className="relative p-[20px] pt-[70px]">
                     <div className='flex flex-row gap-4 items-center'>
 
-                        <img src={`/images/temp/mcbb.webp`} alt={`${props.data.name} Minecraft Server Logo`} className="w-[55px] rounded-xl aspect-square object-cover"/>
+                        <img src={props.data.logoUrl} alt={`${props.data.name} Minecraft Server Logo`} className="w-[55px] rounded-xl aspect-square object-cover"/>
 
                         <div className='m-0'>
 
@@ -45,14 +45,19 @@ export default function ServerCard(props: { data: ServerCardDetails }) {
 
                     </div>
                     <div className='mt-3'>
-                        <p className='text-gray-600 text-[14px] font-[400] mb-2 -mt-1'>{props.data.modeCardDesc}</p>
+                        <p className='text-gray-600 text-[14px] font-[400] mb-3'>{props.data.modeCardDesc}</p>
 
-                        <div className='grid grid-cols-2 gap-1 ml-[2px]'>
+                        <div className='grid grid-cols-2 gap-1.5 ml-[2px]'>
                             {props.data.tags.slice(0, 6).map((tag) => (
 
                                 <HoverCard>
                                     {/* TODO remove capitalize style */}
-                                    <HoverCardTrigger><p key={tag} className="flex font-semibold text-gray-600 text-sm items-center gap-1 capitalize">{getIcon("STYLE")} {tag}</p></HoverCardTrigger>
+                                    <HoverCardTrigger>
+                                        <p key={tag} className="flex font-semibold text-gray-700 text-[14px] items-center gap-1 capitalize">
+                                            {getIcon("STYLE")}
+                                            {tag}
+                                        </p>
+                                    </HoverCardTrigger>
                                     <HoverCardContent>
                                         <TagCardContent data={JSON.parse('{"id":"01949634-5616-77e0-be7a-912c4d9d94f1","name":"WorldEdit","desc":"An easy-to-use in-game world editor.","modeId":"01949633-064a-76ed-872d-5c531080990a","type":"PLUGIN","aka":["FAWE","WE","Editor"]}')}/>
                                     </HoverCardContent>
@@ -67,7 +72,7 @@ export default function ServerCard(props: { data: ServerCardDetails }) {
 }
 
 
-function getIcon(type: string) {
+export function getIcon(type: string) {
     switch (type) {
         case 'PLUGIN':
             return <Blocks size={12} className="-ml-[2px] mb-[1px]"/>;

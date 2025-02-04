@@ -1,7 +1,9 @@
 import { drizzle } from "drizzle-orm/d1"
 import { eq } from "drizzle-orm";
 import type { APIContext } from "astro";
-import { modesTable, serversTable } from "@/db/schema";
+import { serverModesTable, serversTable } from "@/db/schema";
+import DOMPurify from 'isomorphic-dompurify';
+import { marked } from 'marked';
 
 export async function GET({ params, request, locals }: APIContext) {
 
@@ -11,7 +13,7 @@ export async function GET({ params, request, locals }: APIContext) {
   const response = await drizzle(locals.runtime.env.DB)
     .select()
     .from(serversTable)
-    .innerJoin(modesTable, eq(modesTable.id, serversTable.id))
+    .innerJoin(serverModesTable, eq(serverModesTable.serverId, serversTable.id))
     .where(
       eq(serversTable.id, id)
     );
@@ -31,6 +33,13 @@ export async function GET({ params, request, locals }: APIContext) {
       })
     ]
   }  
+
+  // info.desc = DOMPurify.sanitize(
+  //   (await marked.parse(
+  //     info.desc
+  //   ))
+  //   .replace(/^[\u200B\u200C\u200D\u200E\u200F\uFEFF]/,"") // Remove common zero-width characters (could cause issues)
+  // );
 
 
   return new Response(JSON.stringify(info))

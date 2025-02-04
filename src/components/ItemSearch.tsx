@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { ArrowBigRight, SearchIcon, X } from 'lucide-react';
-import { HoverCard, HoverCardContent, HoverCardTrigger } from '@radix-ui/react-hover-card';
 import classNames from 'classnames';
 import TagCardContent, { getColorConditions, type TagType } from './TagCardContent';
 import { Card } from './ui/card';
+import TagCard from './BubbleCard';
+import TagBubbleCard from './TagBubbleCard';
 
 export default function ItemSearch(props: {
     onSelectOne?: (item: TagType) => void,
@@ -58,19 +59,7 @@ export default function ItemSearch(props: {
 
           {props.selected.map((item) => (
 
-            <HoverCard>
-              <HoverCardTrigger>
-                <div className={classNames('flex items-center gap-0.5 rounded-full w-max px-4 py-0.5 border border-gray-400 bg-', getColorConditions(item.type))}>
-                  {/* Removes the tag */}
-                  <p className='mb-[2px]'>{item.name}</p>
-                  <X size={18} strokeWidth={1.5} className='-mr-[6px] cursor-pointer hover:stroke-[2.5px]'
-                    onClick={() => remove(item)}/>
-                </div>
-              </HoverCardTrigger>
-              <HoverCardContent>
-                <TagCardContent data={item}/>
-              </HoverCardContent>
-            </HoverCard>
+            <TagBubbleCard data={item} onClose={() => remove(item)}/>
 
           ))}
 

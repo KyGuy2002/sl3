@@ -30,10 +30,13 @@
     "clsx": "^2.1.1",
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.38.4",
+    "isomorphic-dompurify": "^2.21.0",
     "llm-chunk": "^0.0.1",
     "lucide-react": "^0.473.0",
+    "marked": "^15.0.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-markdown": "^9.0.3",
     "tailwind-merge": "^2.6.0",
     "tailwindcss": "^3.4.17",
     "tailwindcss-animate": "^1.0.7"
@@ -41,6 +44,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250121.0",
     "drizzle-kit": "^0.30.2",
+    "sass-embedded": "^1.83.4",
     "tsx": "^4.19.2",
     "wrangler": "^3.105.0"
   }

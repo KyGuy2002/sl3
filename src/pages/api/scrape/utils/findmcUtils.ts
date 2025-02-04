@@ -5,7 +5,7 @@ import { eq, or } from "drizzle-orm";
 
 
 export async function getIdList(page: number): Promise<string[]> {
-    const res = await fetch(`https://findmcserver.com/api/servers?pageNumber=${page}&pageSize=15&sortBy=default&gamerSaferStatus=undefined&mojangStatus=undefined`);
+    const res = await fetch(`https://findmcserver.com/api/servers?pageNumber=${page}&pageSize=8&sortBy=default&gamerSaferStatus=undefined&mojangStatus=undefined`);
     const json: any = await res.json();
 
     const ids: string[] = [];
@@ -59,6 +59,7 @@ async function getGameModes(env: any, serverId: string, desc: string, tags: any)
 
         const ourMode = await getMatchingMode(env, t.name, t.description);
         if (!ourMode) return;
+        console.log("ourMode", ourMode)
 
 
         // Get tags
@@ -72,7 +73,8 @@ async function getGameModes(env: any, serverId: string, desc: string, tags: any)
         
         serverModes.push({
             serverId: serverId,
-            modeId: ourMode.id,
+            modeId: ourMode.id, // TODO id not returned...
+            modeName: ourMode.name,
             cardDesc: (await getServerShortDesc(env, desc, ourMode)).replaceAll("\"", " "),
             fullDesc: desc.slice(0, 200), // TODO ai gen this?
             tags: res.map((r: any) => r.name),

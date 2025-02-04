@@ -65,6 +65,51 @@
   }
 }
 
-.passkey-white {
+.svg-white {
   filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(248deg) brightness(106%) contrast(106%);
+}
+
+.markdown-style {
+
+  @apply text-black;
+
+  h1, h2, h3, h4, h5, h6 {
+
+    &:not(:first-of-type) {
+      @apply mt-6;
+    }
+  }
+
+  h4 {
+    @apply text-lg font-bold;
+  }
+
+  h3 {
+    @apply text-xl font-bold;
+  }
+
+  h1 {
+    @apply text-3xl font-bold;
+  }
+
+  h2 {
+    @apply text-2xl font-bold;
+  }
+
+  p {
+    @apply text-lg font-normal;
+  }
+
+  hr {
+    @apply my-3 border-t border-gray-500 border-2;
+  }
+
+  strong {
+    @apply font-bold;
+  }
+
+  code {
+    @apply bg-gray-100 px-1 rounded border-2 border-gray-300;
+  }
+
 }

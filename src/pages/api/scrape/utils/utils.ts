@@ -17,7 +17,6 @@ export async function getMatchingMode(env: any, foreignModeName: string, foreign
 
 // TODO preset some mappings from foreign to our tags (maybe do it the specific site adapter/utils?)
 export async function getTagsFromDesc(env: any, modeId: string, desc: string, foreignTags: { name: string, desc?: string }[]) {
-    console.log("===== getTagsFromDesc")
 
     // Split desc into chunks
     // const chunks = chunk(desc, {
@@ -37,9 +36,7 @@ export async function getTagsFromDesc(env: any, modeId: string, desc: string, fo
     const ids: string[] = [];
 
 
-    console.log("A")
     for (const c of chunks) {
-        console.log("processing chunk: " + c);
 
         // Get embedding
         const { vector, cached } = await getOrGenEmbed(env, c);
@@ -55,16 +52,13 @@ export async function getTagsFromDesc(env: any, modeId: string, desc: string, fo
             }
         )
 
-        console.log("Added: " + nearest.matches[0].id)
         ids.push(nearest.matches[0].id);
 
     };
-    console.log("B")
 
 
     // Remove duplicates
     const uniqueIds = [...new Set(ids)];
-    console.log(ids, uniqueIds)
 
     return uniqueIds;
 

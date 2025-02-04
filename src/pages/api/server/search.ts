@@ -64,4 +64,6 @@ export type ServerCardDetails = {
   onlinePlayers: number,
   versionStart: string,
   versionEnd: string,
+  bannerUrl: string,
+  logoUrl: string,
 }

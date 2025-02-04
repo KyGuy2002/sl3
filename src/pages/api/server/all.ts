@@ -1,4 +1,4 @@
-import { modesTable, serversTable } from "@/db/schema";
+import { serverModesTable, serversTable } from "@/db/schema";
 import type { APIContext } from "astro";
 import { and, desc, eq, like } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
@@ -9,25 +9,24 @@ export async function GET({ params, request, locals }: APIContext) {
 
   // All
   const response = await drizzle(locals.runtime.env.DB)
-    .select({
-      id: serversTable.id,
-      name: serversTable.name,
-      ip: serversTable.ip,
-      onlinePlayers: serversTable.onlinePlayers,
-      versionStart: serversTable.versionStart,
-      versionEnd: serversTable.versionEnd,
-      desc: serversTable.desc,
-    })
+    .select()
     .from(serversTable)
+    .innerJoin(serverModesTable, eq(serversTable.id, serverModesTable.serverId))
   
 
-  response.map((server: any) => {
-    server.mode = "Creative"
-    server.tags = ["NPC", "Creative", "Roleplay"]
-    server.modeCardDesc = server.desc.slice(0, 70);
+  // TODO work with many to one relation
+  const newRes = [];
+  response.map((res: any) => {
+    const server = res.servers;
+    const mode = res.server_modes;
+    server.mode = mode.name;
+    server.tags = mode.tags;
+    server.modeCardDesc = mode.cardDesc;
+    newRes.push(server);
   })
 
-  return new Response(JSON.stringify(response))
+
+  return new Response(JSON.stringify(newRes))
 
 }
 
