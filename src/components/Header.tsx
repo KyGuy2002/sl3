@@ -9,7 +9,12 @@ export default function Header() {
                 MC Server List
             </a>
 
-            <Button variant="header" className='ml-auto' onClick={() => window.location.href = "/search"}><Binoculars strokeWidth={2.5} /> Find Another Server</Button>
+            <Button variant="header" className='ml-auto' asChild>
+                <a href="/search">
+                    <Binoculars strokeWidth={2.5} />
+                    Find Another Server
+                </a>
+            </Button>
 
             <LoginHeaderButton/>
         </div>
