@@ -17,9 +17,9 @@ import { VARS } from "@/styles/vars";
 		<title>Minecraft Server List</title>
 		<ClientRouter/>
 	</head>
-	<body>
+	<body class="font-[prompt]">
 		<Header/>
-		<div class="font-[prompt] bg-gray-200 px-8 py-4 flex flex-col items-center min-h-full">
+		<div class="bg-gray-200 px-8 py-4 flex flex-col items-center min-h-full">
 
 			<div class="w-full" style={{maxWidth: `${(VARS.cardGap + VARS.serverCardMinWidth) * 4}px`}}>
 				<slot/>

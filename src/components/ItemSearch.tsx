@@ -8,12 +8,12 @@ import type { TagDetailsType } from '@/pages/api/server/utils';
 import { Button } from './ui/button';
 
 export default function ItemSearch(props: {
-    defaultEndpoint: string,
-    queryEndpoint: string,
-    placeholder: string,
-    onNext: (selected: TagDetailsType[]) => void,
-    onlyOne?: boolean,
-    allowSkip?: boolean,
+  defaultEndpoint: string,
+  queryEndpoint: string,
+  placeholder: string,
+  onNext: (selected: TagDetailsType[]) => void,
+  onlyOne?: boolean,
+  allowSkip?: boolean,
 }) {
 
   const abortRef = useRef<AbortController>(null);
@@ -36,6 +36,10 @@ export default function ItemSearch(props: {
   }
 
   useEffect(() => {
+    inputRef.current?.focus();
+  }, [])
+
+  useEffect(() => {
 
     if (props.onlyOne && selected.length > 0) props.onNext(selected);
 
@@ -55,6 +59,7 @@ export default function ItemSearch(props: {
         inputRef.current.value = typeahead;
         setTypeahead(undefined);
       }
+      if (e.key === 'Enter') select(getFirstItem())
     }
 
     document.addEventListener('keydown', handle);
@@ -77,51 +82,53 @@ export default function ItemSearch(props: {
         </div>
 
 
-        <div className='flex gap-3 mb-1 justify-stretch items-stretch'>
-        <div className='w-full -ml-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-2xl p-1'>
-          <div className='bg-gray-200 rounded-xl p-1'>
-            <Card className='flex gap-2 items-center py-2 px-3 text-gray-500 outline outline-[2px] outline-transparent has-[:focus]:outline-black'>
+        <div className='flex gap-4 mb-1 align-stretch'>
+        
+          {/* NOTE: w-screen is used here instead of w-full because of negative margin */}
+          <div className='w-screen -mx-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-2xl p-1'>
+            <div className='bg-gray-200 rounded-xl p-1'>
+              <Card className='flex gap-2 items-center py-2 px-3 text-gray-500 outline outline-[2px] outline-transparent has-[:focus]:outline-black'>
 
-              {!loading && <SearchIcon size={18}/>}
+                {!loading && <SearchIcon size={18}/>}
 
-              {loading && <img src="/icons/spinner.svg" className='h-[18px] w-[17.5px]'/>}
+                {loading && <img src="/icons/spinner.svg" className='h-[18px] w-[17.5px]'/>}
 
-              <div className='w-full relative'>
-                <input ref={inputRef} placeholder={props.placeholder} autoFocus className='focus:outline-transparent w-full text-black'
-                  onChange={searchChange}
-                  onKeyDown={(e) => e.key === 'Enter' && select(getFirstItem())}
-                />
+                <div className='w-full relative'>
+                  <input ref={inputRef} placeholder={props.placeholder} className='focus:outline-transparent w-full text-black'
+                    onChange={searchChange}
+                  />
 
-                <div className='absolute top-0 text-gray-400 flex items-center'>
-                  <span className='opacity-0'>{inputRef.current?.value}</span>
-                  {typeahead?.slice(inputRef.current?.value.length)}
-                  {typeahead && <p
-                    className='bg-gray-400 rounded-md text-[10px] font-bold text-white px-[5px] py-0.5
-                    flex items-center gap-[0.5px] pr-[2.5px] w-max ml-1'
-                  >
-                    TAB
-                    <ArrowBigRight size={15} strokeWidth={2.2}/>  
-                  </p>}
+                  <div className='absolute top-0 text-gray-400 flex items-center'>
+                    <span className='opacity-0'>{inputRef.current?.value}</span>
+                    {typeahead?.slice(inputRef.current?.value.length)}
+                    {typeahead && <p
+                      className='bg-gray-400 rounded-md text-[10px] font-bold text-white px-[5px] py-0.5
+                      flex items-center gap-[0.5px] pr-[2.5px] w-max ml-1'
+                    >
+                      TAB
+                      <ArrowBigRight size={15} strokeWidth={2.2}/>  
+                    </p>}
+                  </div>
                 </div>
-              </div>
 
-            </Card>
+              </Card>
+            </div>
           </div>
-        </div>
 
-        {(!props.onlyOne || props.allowSkip) &&
-          <Button
-            disabled={!props.allowSkip && selected.length == 0}
-            className='min-w-[150px] h-full rounded-2xl bg-green-600 font-semibold tracking-wide text-lg uppercase'
-            onClick={() => {
-              if (props.allowSkip && selected.length == 0) return props.onNext([]);
-              props.onNext(selected);
-            }}
-          >
-            {props.allowSkip && selected.length == 0 ? 'Skip' : 'Next'}
-            <ChevronRight/>
-          </Button>
-        }
+          {(!props.onlyOne || props.allowSkip) &&
+            // NOTE: Needs to be INSIDE a div for some reason or else it doesnt stretch vertically...
+            <div>
+              <Button
+                disabled={!props.allowSkip && selected.length == 0}
+                className='max-w-[250px] min-w-[150px] w-[15vw] h-full rounded-2xl bg-green-600 border-[3px] border-green-700 hover:bg-green-700 hover:border-green-800 font-semibold tracking-wide text-lg uppercase'
+                // TODO does it actually prevent from clicking when disabled?
+                onClick={() => props.onNext(selected)}
+              >
+                {props.allowSkip && selected.length == 0 ? 'Skip' : 'Next'}
+                <ChevronRight/>
+              </Button>
+            </div>
+          }
 
         </div>
 
@@ -142,13 +149,13 @@ export default function ItemSearch(props: {
             <p className='mb-4 text-center'>Check your spelling and try different keywords.</p>
           </>}
 
-          {data.bestItems.length > 0 && <FilterFlex items={data.bestItems} highlight={true} gray={false} onClick={select}/>}
+          {data.bestItems.length > 0 && <FilterFlex items={data.bestItems} highlight={true} gray={false} onClick={toggle}/>}
 
-          {data.items.length > 0 && <FilterFlex items={data.items} highlight={false} gray={false} onClick={select}/>}
+          {data.items.length > 0 && <FilterFlex items={data.items} highlight={false} gray={false} onClick={toggle}/>}
 
           {data.maybeItems.length > 0 && <>
             <p className='mt-5'>Maybe what you are looking for:</p>
-            <FilterFlex items={data.maybeItems} highlight={false} gray={true} onClick={select}/>
+            <FilterFlex items={data.maybeItems} highlight={false} gray={true} onClick={toggle}/>
           </>}
 
 
@@ -159,7 +166,13 @@ export default function ItemSearch(props: {
 
 
   function getFirstItem() {
-    return data.bestItems[0] || data.items[0] || data.maybeItems[0] || null;
+    return data && (data.bestItems[0] || data.items[0] || data.maybeItems[0]) || null;
+  }
+
+
+  function toggle(item: TagDetailsType) {
+    if (selected.includes(item)) remove(item);
+    else select(item);
   }
 
 
@@ -238,8 +251,9 @@ export default function ItemSearch(props: {
     return (
       <div className="flex flex-wrap gap-2">
         {localProps.items.map((item: any) => (
-          <Card key={item.id} className={classNames('relative px-4 py-2 cursor-pointer hover:bg-gray-50 border-2 border-transparent hover:border-gray-400 grow flex flex-col justify-between', {
-              'opacity-[0.7]': localProps.gray,
+          <Card key={item.id} className={classNames('relative px-4 py-2 cursor-pointer border-2 border-transparent hover:border-gray-400 grow flex flex-col justify-between', {
+            'hover:bg-gray-50': !selected.includes(item),  
+            'opacity-[0.7]': localProps.gray,
               'outline outline-1 outline-gray-700': localProps.highlight,
               'outline outline-[3.5px] outline-gray-400': getFirstItem() === item && data != defData,
               ...(selected.includes(item) ? getColorConditions(item.type, true) : {})

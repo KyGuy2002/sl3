@@ -82,9 +82,7 @@ export default function HomePage() {
 
                 <SearchIcon size={18}/>
 
-                <a className='' href="/search">
-                  <p className=''>Start Searching</p>
-                </a>
+                <p className=''>Start Searching</p>
 
               </Card>
             </div>

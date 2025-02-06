@@ -1,9 +1,9 @@
 ---
 import '@/styles/globals.scss'
 import Layout from '../../layouts/Layout.astro';
-import ModeSearchPage from '@/components/pages/search/ModeSearchPage';
+import TagSearchPage from '@/components/pages/search/TagSearchPage';
 ---
 
 <Layout>
-    <ModeSearchPage client:load/>
+    <TagSearchPage client:only/>
 </Layout>
