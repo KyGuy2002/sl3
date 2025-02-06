@@ -1,22 +1,25 @@
 import { useState, useEffect, useRef } from 'react';
-import { ArrowBigRight, SearchIcon, X } from 'lucide-react';
+import { ArrowBigRight, ChevronRight, SearchIcon } from 'lucide-react';
 import classNames from 'classnames';
-import TagCardContent, { getColorConditions, type TagType } from './TagCardContent';
+import TagCardContent, { getColorConditions } from './TagCardContent';
 import { Card } from './ui/card';
-import TagCard from './BubbleCard';
 import TagBubbleCard from './TagBubbleCard';
+import type { TagDetailsType } from '@/pages/api/server/utils';
+import { Button } from './ui/button';
 
 export default function ItemSearch(props: {
-    onSelectOne?: (item: TagType) => void,
-    selected: TagType[],
-    setSelected: (items: TagType[]) => void,
     defaultEndpoint: string,
     queryEndpoint: string,
     placeholder: string,
+    onNext: (selected: TagDetailsType[]) => void,
+    onlyOne?: boolean,
+    allowSkip?: boolean,
 }) {
 
   const abortRef = useRef<AbortController>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const [selected, setSelected] = useState<TagDetailsType[]>([]);
 
   const [data, setData] = useState<any>();
   const [typeahead, setTypeahead] = useState<any>();
@@ -33,40 +36,49 @@ export default function ItemSearch(props: {
   }
 
   useEffect(() => {
+
+    if (props.onlyOne && selected.length > 0) props.onNext(selected);
+
+  }, [selected])
+
+  useEffect(() => {
     abortRef.current = new AbortController();
     load();
   }, [])
 
   useEffect(() => {
 
-    document.addEventListener('keydown', (e) => {
+    function handle(e: any) {
       if (e.key === 'Tab' && typeahead) {
         e.preventDefault();
         if (!inputRef.current) return;
         inputRef.current.value = typeahead;
         setTypeahead(undefined);
       }
-    });
+    }
 
-  });
+    document.addEventListener('keydown', handle);
+    return () => document.removeEventListener('keydown', handle);
+  }, []);
 
 
   return (
     <div>
 
 
-        <div className='mb-3 flex gap-2'>
+        <div className='mb-4 flex gap-2'>
 
-          {props.selected.map((item) => (
+          {selected.map((item) => (
 
-            <TagBubbleCard data={item} onClose={() => remove(item)}/>
+            <TagBubbleCard key={item.id} data={item} onClose={() => remove(item)}/>
 
           ))}
 
         </div>
 
 
-        <div className='mb-1 -m-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-2xl p-1'>
+        <div className='flex gap-3 mb-1 justify-stretch items-stretch'>
+        <div className='w-full -ml-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-2xl p-1'>
           <div className='bg-gray-200 rounded-xl p-1'>
             <Card className='flex gap-2 items-center py-2 px-3 text-gray-500 outline outline-[2px] outline-transparent has-[:focus]:outline-black'>
 
@@ -95,6 +107,22 @@ export default function ItemSearch(props: {
 
             </Card>
           </div>
+        </div>
+
+        {(!props.onlyOne || props.allowSkip) &&
+          <Button
+            disabled={!props.allowSkip && selected.length == 0}
+            className='min-w-[150px] h-full rounded-2xl bg-green-600 font-semibold tracking-wide text-lg uppercase'
+            onClick={() => {
+              if (props.allowSkip && selected.length == 0) return props.onNext([]);
+              props.onNext(selected);
+            }}
+          >
+            {props.allowSkip && selected.length == 0 ? 'Skip' : 'Next'}
+            <ChevronRight/>
+          </Button>
+        }
+
         </div>
 
 
@@ -135,23 +163,18 @@ export default function ItemSearch(props: {
   }
 
 
-  function select(item: TagType) {
+  function select(item: TagDetailsType) {
     if (!item) return;
 
-    if (props.onSelectOne) {
-        props.onSelectOne(item);
-        return;
-    }
-
-    props.setSelected([...props.selected, item]);
+    setSelected([...selected, item]);
 
     // Make user select all text in field (faster to restart typing)
     inputRef.current?.select();
   }
 
 
-  function remove(item: TagType) {
-    props.setSelected(props.selected.filter(i => i !== item));
+  function remove(item: TagDetailsType) {
+    setSelected(selected.filter(i => i !== item));
   }
 
 
@@ -215,11 +238,11 @@ export default function ItemSearch(props: {
     return (
       <div className="flex flex-wrap gap-2">
         {localProps.items.map((item: any) => (
-          <Card className={classNames('relative px-4 py-2 cursor-pointer hover:bg-gray-50 border-2 border-transparent hover:border-gray-400 grow flex flex-col justify-between', {
+          <Card key={item.id} className={classNames('relative px-4 py-2 cursor-pointer hover:bg-gray-50 border-2 border-transparent hover:border-gray-400 grow flex flex-col justify-between', {
               'opacity-[0.7]': localProps.gray,
               'outline outline-1 outline-gray-700': localProps.highlight,
               'outline outline-[3.5px] outline-gray-400': getFirstItem() === item && data != defData,
-              ...(props.selected.includes(item) ? getColorConditions(item.type, true) : {})
+              ...(selected.includes(item) ? getColorConditions(item.type, true) : {})
             })}
             onClick={() => localProps.onClick(item)}
           >

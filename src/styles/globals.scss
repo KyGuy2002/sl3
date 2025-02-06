@@ -73,30 +73,27 @@
 
   @apply text-black;
 
-  h1, h2, h3, h4, h5, h6 {
-
-    &:not(:first-of-type) {
-      @apply mt-6;
-    }
-  }
-
   h4 {
     @apply text-lg font-bold;
+    &:not(:first-child)  { @apply mt-4;}
   }
 
   h3 {
     @apply text-xl font-bold;
+    &:not(:first-child)  { @apply mt-6;}
   }
 
   h1 {
     @apply text-3xl font-bold;
+    &:not(:first-child) { @apply mt-8;}
   }
 
   h2 {
     @apply text-2xl font-bold;
+    &:not(:first-child) { @apply mt-6;}
   }
 
-  p {
+  p, li {
     @apply text-lg font-normal;
   }
 
@@ -110,6 +107,18 @@
 
   code {
     @apply bg-gray-100 px-1 rounded border-2 border-gray-300;
+  }
+
+  ul {
+
+    @apply list-disc list-inside ml-2;
+    list-style-type: disc;
+
+    ul {
+      @apply ml-8;
+      list-style-type: circle;
+    }
+
   }
 
 }

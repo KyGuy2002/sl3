@@ -1,4 +1,3 @@
-import type { ServerCardDetails } from "@/pages/api/server/search";
 import { Card } from "@/components/ui/card";
 import {
     HoverCard,
@@ -6,18 +5,34 @@ import {
     HoverCardTrigger,
 } from "@/components/ui/hover-card"
 import TagCardContent from "./TagCardContent";
-import { Blocks, Copy, SwatchBook } from "lucide-react";
+import { Blocks, Circle, Copy, Drill, FerrisWheel, SwatchBook } from "lucide-react";
+import type { ModeDetailsType, ServerCardDetails, ServerModeType, TagDetailsType } from "@/pages/api/server/utils";
+import { useEffect, useState } from "react";
+import classNames from "classnames";
+import { VARS } from "@/styles/vars";
   
 
-export default function ServerCard(props: { data: ServerCardDetails }) {
+export default function ServerCard(props: {
+    data: ServerCardDetails,
+    hideModeName?: boolean,
+    interestedModeId?: string,
+    interestedTagIds?: string[],
+}) {
+
+    const [displayedDetails, setDisplayedDetails] = useState<DisplayedDetailsType>(getDisplayedDetails());
+
     return (
-        <a href={`/server/${props.data.id}`} className="flex-grow-0 min-w-[300px] cursor-pointer hover:scale-[1.008] transition-transform focus:scale-[1.1]">
+        <a
+            href={`/server/${props.data.id}`}
+            className='flex-grow-0 cursor-pointer hover:scale-[1.008] transition-transform focus:scale-[1.1]'
+            style={{minWidth: `${VARS.serverCardMinWidth}px`}}
+        >
             <Card className='h-full hover:bg-gray-50 overflow-hidden'>
 
                 {/* Banner Image */}
                 <div className="h-0">
                     <div className="w-full h-[100px] relative">
-                        <img src={props.data.bannerUrl} alt={`${props.data.name} Minecraft Server`}
+                        <img src={props.data.bannerUrl || undefined} alt={`${props.data.name} Minecraft Server`}
                             className="absolute w-full h-full object-cover object-center"
                         />
                         <div className="absolute w-full h-full" style={{backgroundImage: 'linear-gradient(rgba(0,0,0,0), rgba(255,255,255,1))'}}></div>
@@ -27,7 +42,7 @@ export default function ServerCard(props: { data: ServerCardDetails }) {
                 <div className="relative p-[20px] pt-[70px]">
                     <div className='flex flex-row gap-4 items-center'>
 
-                        <img src={props.data.logoUrl} alt={`${props.data.name} Minecraft Server Logo`} className="w-[55px] rounded-xl aspect-square object-cover"/>
+                        <img src={props.data.logoUrl || undefined} alt={`${props.data.name} Minecraft Server Logo`} className="w-[55px] rounded-xl aspect-square object-cover"/>
 
                         <div className='m-0'>
 
@@ -45,23 +60,34 @@ export default function ServerCard(props: { data: ServerCardDetails }) {
 
                     </div>
                     <div className='mt-3'>
-                        <p className='text-gray-600 text-[14px] font-[400] mb-3'>{props.data.modeCardDesc}</p>
+
+                        {!props.hideModeName && <p className='text-gray-500 text-[13px] font-bold uppercase'>{displayedDetails.mode.details.name}</p>}
+
+                        <p className='text-gray-600 text-[14px] font-[400] mb-3'>{displayedDetails.mode.cardDesc}</p>
 
                         <div className='grid grid-cols-2 gap-1.5 ml-[2px]'>
-                            {props.data.tags.slice(0, 6).map((tag) => (
+                            {displayedDetails.tags.map((t) => (
 
-                                <HoverCard>
-                                    {/* TODO remove capitalize style */}
-                                    <HoverCardTrigger>
-                                        <p key={tag} className="flex font-semibold text-gray-700 text-[14px] items-center gap-1 capitalize">
-                                            {getIcon("STYLE")}
-                                            {tag}
-                                        </p>
-                                    </HoverCardTrigger>
-                                    <HoverCardContent>
-                                        <TagCardContent data={JSON.parse('{"id":"01949634-5616-77e0-be7a-912c4d9d94f1","name":"WorldEdit","desc":"An easy-to-use in-game world editor.","modeId":"01949633-064a-76ed-872d-5c531080990a","type":"PLUGIN","aka":["FAWE","WE","Editor"]}')}/>
-                                    </HoverCardContent>
-                                </HoverCard>
+                                <p key={t.id} className={classNames('flex text-[14px] items-center gap-1 capitalize', {
+                                    ['text-gray-400 font-[500]']: props.interestedTagIds?.includes(t.id),
+                                    ['text-gray-700 font-semibold']: !props.interestedTagIds?.includes(t.id),
+                                })}>
+                                    {getIcon(t.type)}
+                                    {t.name}
+                                </p>
+
+                                // TODO fix this hover card (a nesting)
+                                // <HoverCard key={t.id}>
+                                //     <HoverCardTrigger>
+                                //         <p key={t.id} className="flex font-semibold text-gray-700 text-[14px] items-center gap-1 capitalize">
+                                //             {getIcon(t.type)}
+                                //             {t.name}
+                                //         </p>
+                                //     </HoverCardTrigger>
+                                //     <HoverCardContent>
+                                //         <TagCardContent data={t}/>
+                                //     </HoverCardContent>
+                                // </HoverCard>
                             ))}
                         </div>
                     </div>
@@ -69,6 +95,47 @@ export default function ServerCard(props: { data: ServerCardDetails }) {
             </Card>
         </a>
     );
+
+    function getDisplayedDetails() {
+        const d = {} as DisplayedDetailsType;
+
+        // Get Mode
+        if (props.interestedModeId) d.mode = props.data.modes.filter((m) => m.details.id === props.interestedModeId)[0];
+        else d.mode = props.data.modes[Math.floor(Math.random() * props.data.modes.length)];
+
+
+        // Get tags that match the interested tag ids and fill the remaining space with other random tags
+        const interested = props.interestedTagIds || [];
+        
+        // Get the ones we want
+        const result = d.mode.tags.filter((t) => interested.includes(t.id));
+
+        // Get the rest
+        const notGotten = d.mode.tags.filter((t) => !interested.includes(t.id));
+
+        // Loop remaining spaces (max - interested)
+        const count = 6 - result.length;
+        for (let i = 0; i < count; i++) {
+
+            // If we ran out, just stop
+            if (notGotten.length == 0) break;
+
+            // Pick a random remaining tag
+            const t = notGotten[Math.floor(Math.random() * notGotten.length)];
+
+            // Add to result
+            result.push(t);
+
+            // Remove from notGotten
+            notGotten.splice(notGotten.indexOf(t), 1);
+
+        }
+
+        d.tags = result;
+
+        return d;
+    }
+
 }
 
 
@@ -78,7 +145,14 @@ export function getIcon(type: string) {
             return <Blocks size={12} className="-ml-[2px] mb-[1px]"/>;
         case 'STYLE':
             return <SwatchBook size={12} className="-ml-[2px]"/>;
+        case 'FEATURE':
+            return <FerrisWheel size={12} className="-ml-[2px]"/>;
+        case 'TOOL':
+                return <Drill size={12} className="-ml-[2px]"/>;
         default:
-            return <Blocks size={15} />;
+            return <Circle size={15} />;
     }
 }
+
+
+type DisplayedDetailsType = { mode: ServerModeType, tags: TagDetailsType[] };

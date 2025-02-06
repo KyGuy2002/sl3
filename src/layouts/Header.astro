@@ -1,0 +1,25 @@
+---
+import HeaderButtons from "@/components/HeaderButtons";
+import LoginHeaderButton from "@/components/login/LoginHeaderButton";
+
+
+---
+
+<div class='bg-gray-900 text-white p-4 py-2.5 text-xl font-bold flex relative z-10'>
+    <a href='/' class='flex items-center gap-1 cursor-pointer'>
+        MC Server List
+    </a>
+
+
+
+    {/* <Button variant="header" className='ml-auto' asChild>
+        <a href="/search">
+            <Binoculars strokeWidth={2.5} />
+            Find Another Server
+        </a>
+    </Button> */}
+
+    <HeaderButtons client:only />
+
+    <LoginHeaderButton client:load/>
+</div>

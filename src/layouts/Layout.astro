@@ -1,6 +1,7 @@
 ---
-import Header from '@/components/Header';
+import Header from './Header.astro';
 import { ClientRouter } from 'astro:transitions';
+import { VARS } from "@/styles/vars";
 ---
 
 <!doctype html>
@@ -17,8 +18,14 @@ import { ClientRouter } from 'astro:transitions';
 		<ClientRouter/>
 	</head>
 	<body>
-		<Header client:load/>
-		<slot />
+		<Header/>
+		<div class="font-[prompt] bg-gray-200 px-8 py-4 flex flex-col items-center min-h-full">
+
+			<div class="w-full" style={{maxWidth: `${(VARS.cardGap + VARS.serverCardMinWidth) * 4}px`}}>
+				<slot/>
+			</div>
+
+		</div>
 	</body>
 </html>
 

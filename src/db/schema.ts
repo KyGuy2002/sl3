@@ -20,12 +20,22 @@ export const serversTable = sqliteTable("servers", {
 export const serverModesTable = sqliteTable("server_modes", {
   serverId: text().notNull().references(() => serversTable.id),
   modeId: text().notNull().references(() => allModesTable.id),
-  tags: text({ mode: "json" }).notNull(),
   cardDesc: text().notNull(),
   fullDesc: text().notNull(),
 }, (table) => {
   return {
     pk: primaryKey({ columns: [table.serverId, table.modeId] })
+  };
+});
+
+
+export const serverModesTagsTable = sqliteTable("server_modes_tags", {
+  serverId: text().notNull().references(() => serversTable.id),
+  modeId: text().notNull().references(() => allModesTable.id),
+  tagId: text().notNull().references(() => allTagsTable.id),
+}, (table) => {
+  return {
+    pk: primaryKey({ columns: [table.serverId, table.modeId, table.tagId] })
   };
 });
 

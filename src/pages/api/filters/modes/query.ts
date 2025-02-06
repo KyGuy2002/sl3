@@ -1,5 +1,5 @@
 import type { APIContext } from "astro";
-import { runFtsQuery, runQuery } from "../../queryUtils";
+import { runFtsQuery } from "../../queryUtils";
 
 
 export async function GET({ params, request, locals }: APIContext) {

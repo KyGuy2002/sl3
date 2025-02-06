@@ -5,21 +5,25 @@ import {
 } from "@/components/ui/hover-card"
 import classNames from "classnames";
 import { X } from "lucide-react";
-import TagCardContent, { getColorConditions, type TagType } from "./TagCardContent";
+import TagCardContent, { getColorConditions } from "./TagCardContent";
+import { Card } from "./ui/card";
+import type { TagDetailsType } from "@/pages/api/server/utils";
 
-export default async function TagBubbleCard(props: {
-    data: TagType,
+export default function TagBubbleCard(props: {
+    data: TagDetailsType,
     onClose: () => void,
 }) {
     return (
         <HoverCard>
             <HoverCardTrigger>
-                <div className={classNames('flex items-center gap-0.5 rounded-full w-max px-4 py-0.5 border border-gray-400 bg-', getColorConditions(props.data.type))}>
-                    {/* Removes the tag */}
-                    <p className='mb-[2px]'>{props.data.name}</p>
-                    <X size={18} strokeWidth={1.5} className='-mr-[6px] cursor-pointer hover:stroke-[2.5px]'
-                    onClick={props.onClose}/>
-                </div>
+
+                <Card className="flex items-center gap-1.5 px-4 py-0.5">
+                    <p className=" font-medium text-[15px]">{props.data.name}</p>
+                    <X size={18} strokeWidth={2} className='-mr-[6px] cursor-pointer hover:stroke-[2.5px]'
+                        onClick={props.onClose}
+                    />
+                </Card>
+
             </HoverCardTrigger>
             <HoverCardContent>
                 <TagCardContent data={props.data}/>

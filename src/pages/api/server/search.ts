@@ -1,69 +1,48 @@
-import { modesTable, serversTable } from "@/db/schema";
+import { serverModesTable, serverModesTagsTable, serversTable } from "@/db/schema";
 import type { APIContext } from "astro";
-import { and, desc, eq, like } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
+import { getServerDetails } from "./utils";
 
 
 export async function GET({ params, request, locals }: APIContext) {
   
   const mode = new URL(request.url).searchParams.get("mode");
-  let tags = new URL(request.url).searchParams.get("tags");
-  // const text = new URL(request.url).searchParams.get("text");
+  const rawTags = new URL(request.url).searchParams.get("tags");
+  const tags = ((rawTags && rawTags != "null") ? rawTags.split(",") : []);
 
   // TODO allow any combo
   // TODO add text search
-  if (!mode || !tags) return new Response("Missing parameters.", { status: 400 });
-
-  const likeStatements = tags.split(",").map(tag => {
-    console.log(tag)
-    return like(modesTable.tags, `%\"${tag}\"%`);
-  });
+  if (!mode) return new Response("Missing parameters.", { status: 400 });
 
 
-  // All
-  // TODO also get all other modes
-  const response = await drizzle(locals.runtime.env.DB)
-    .select({
-      id: serversTable.id,
-      name: serversTable.name,
-      ip: serversTable.ip,
-      mode: modesTable.mode,
-      tags: modesTable.tags,
-      modeCardDesc: modesTable.cardDesc,
-      onlinePlayers: serversTable.onlinePlayers,
-      versionStart: serversTable.versionStart,
-      versionEnd: serversTable.versionEnd,
-    })
-    .from(modesTable)
-    .innerJoin(serversTable, eq(modesTable.id, serversTable.id))
+  const tagsStatement = [];
+  for (const t of tags) {
+    tagsStatement.push(eq(serverModesTagsTable.tagId, t));
+  }
+
+  const subquery = drizzle(locals.runtime.env.DB)
+    .select({id: serversTable.id})
+    .from(serversTable)
+    .innerJoin(serverModesTable, eq(serverModesTable.serverId, serversTable.id))
+    .innerJoin(serverModesTagsTable, and(
+      eq(serverModesTagsTable.serverId, serversTable.id),
+      eq(serverModesTagsTable.modeId, serverModesTable.modeId)
+    ))
     .where(
       and(
-        eq(modesTable.mode, mode),
-        ...likeStatements,
+        eq(serverModesTable.modeId, mode),
+        ...tagsStatement,
         eq(serversTable.online, true),
       )
     )
-    .orderBy(...getOrder());
+    .groupBy(serversTable.id);
+  
+  
+  
+  const res = await getServerDetails(locals.runtime.env, inArray(serversTable.id, subquery));
+  
 
-  return new Response(JSON.stringify(response))
+  return new Response(JSON.stringify(res));
 
-}
-
-
-function getOrder() { // TODO does drizzle read both items correctly, or just the first one?
-  return [desc(serversTable.lastUpdated), desc(serversTable.onlinePlayers)]
-}
-
-export type ServerCardDetails = {
-  id: string,
-  name: string,
-  ip: string,
-  mode: string,
-  tags: string[],
-  modeCardDesc: string,
-  onlinePlayers: number,
-  versionStart: string,
-  versionEnd: string,
-  bannerUrl: string,
-  logoUrl: string,
 }

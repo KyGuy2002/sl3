@@ -6,10 +6,7 @@ import type { TagDetailsType } from '@/pages/api/server/utils';
 import classNames from 'classnames';
 import { getColorConditions, getTagColor } from '../TagCardContent';
 
-export default function FilterPage() {
-
-  const [selectedTags, setSelectedTags] = useState<TagDetailsType[]>([]);
-  const [selectedGamemode, setSelectedGamemode] = useState<TagDetailsType>();
+export default function ModeSearchPage() {
 
   return (
     <>

@@ -1,6 +1,7 @@
-import { Binoculars, Search, TextSearch } from 'lucide-react';
+import { Binoculars, Pencil, PenSquare, Search, TextSearch, Trash2 } from 'lucide-react';
 import LoginHeaderButton from './login/LoginHeaderButton';
 import { Button } from './ui/button';
+import HeaderButtons from './HeaderButtons';
 
 export default function Header() {
     return (
@@ -9,12 +10,16 @@ export default function Header() {
                 MC Server List
             </a>
 
-            <Button variant="header" className='ml-auto' asChild>
+
+
+            {/* <Button variant="header" className='ml-auto' asChild>
                 <a href="/search">
                     <Binoculars strokeWidth={2.5} />
                     Find Another Server
                 </a>
-            </Button>
+            </Button> */}
+
+            <HeaderButtons />
 
             <LoginHeaderButton/>
         </div>
