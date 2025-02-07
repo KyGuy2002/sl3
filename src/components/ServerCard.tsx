@@ -48,15 +48,14 @@ export default function ServerCard(props: {
                         <div className='m-0'>
 
                             <p className='font-bold text-[19px] m-0'>{props.data.name}</p>
-                            <p className='group hover:gap-4 transition-transform ease-linear duration-200 text-gray-500 m-0 text-[14.5px] -mt-[2px] flex items-center gap-1.5 border-b-transparent border-b-[1px] h-4 hover:border-b-gray-400'>
+                            <p className='group hover:gap-4 transition-transform ease-linear duration-200 text-gray-500 m-0 text-[14.5px] -mt-[2px] flex items-center gap-1.5 border-b-transparent border-b-[1px] h-4 hover:border-b-gray-400'
+                                onClick={() => navigator.clipboard.writeText(getDisplayedIp()!)}
+                            >
                                 
-                                {/* Interested platform, else whatever it has (java has priority) */}
-                                {(props.interestedPlatform == 'java' && props.data.javaIp)}
-                                {(props.interestedPlatform == 'bedrock' && props.data.bedrockIp)}
-                                {(!props.interestedPlatform && (props.data.javaIp || props.data.bedrockIp))}
+                                {getDisplayedIp()}
        
                                 {/* TODO better hover and click animation */}
-                                <Copy size={11} className="-mb-1 group-hover:scale-125" />
+                                <Copy size={11} className="group-hover:scale-125" />
                             </p>
 
                         </div>
@@ -89,6 +88,12 @@ export default function ServerCard(props: {
             </Card>
         </a>
     );
+
+    function getDisplayedIp() {
+        if (props.interestedPlatform == 'java') return props.data.javaIp;
+        if (props.interestedPlatform == 'bedrock') return props.data.bedrockIp;
+        return props.data.javaIp || props.data.bedrockIp;
+    }
 
     function getDisplayedDetails() {
         const d = {} as DisplayedDetailsType;
