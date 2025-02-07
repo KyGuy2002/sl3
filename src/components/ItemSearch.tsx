@@ -120,12 +120,12 @@ export default function ItemSearch(props: {
             <div>
               <Button
                 disabled={!props.allowSkip && selected.length == 0}
-                className='max-w-[250px] min-w-[150px] w-[15vw] h-full rounded-2xl bg-green-600 border-[3px] border-green-700 hover:bg-green-700 hover:border-green-800 font-semibold tracking-wide text-lg uppercase'
+                className='max-w-[250px] min-w-[150px] w-[15vw] h-full rounded-2xl bg-green-600 border-[3px] border-green-700 hover:bg-green-700 hover:border-green-800 font-semibold tracking-wide text-lg'
                 // TODO does it actually prevent from clicking when disabled?
                 onClick={() => props.onNext(selected)}
               >
                 {props.allowSkip && selected.length == 0 ? 'Skip' : 'Next'}
-                <ChevronRight/>
+                <ChevronRight strokeWidth={4}/>
               </Button>
             </div>
           }

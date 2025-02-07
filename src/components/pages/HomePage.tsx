@@ -95,7 +95,7 @@ export default function HomePage() {
 
 
         <h1 className='text-3xl font-bold mb-3 mt-8 flex gap-3 items-center'>
-          Most Popular
+          Featured Servers
           <span className='bg-gray-300 border-2 border-gray-400 px-3 py-1 rounded-full text-sm mt-1 cursor-pointer'>View All</span>
         </h1>
 

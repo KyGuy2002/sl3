@@ -65,16 +65,21 @@ export default function ServerDetailsPage(props: {id: string}) {
 
                 <div>
                   <h1 className="text-4xl font-bold">{fullData.name}</h1>
-                  <p className="text-gray-500 text-xl font-semibold flex items-center gap-2 group cursor-pointer">
-                    {fullData.ip}
-                    <Copy size={14} className="-mb-[4px] group-hover:scale-125" />
+                  <div className="text-gray-500 text-xl font-semibold flex items-center gap-3">
+                    <p className="group cursor-pointer flex items-center gap-1.5">
+                      <div className="bg-gray-300 rounded-full px-2 text-sm -mr-0.25">Java</div>
+                      {fullData.ip}
+                      <Copy size={14} className="-mb-[1px] group-hover:scale-125" />
+                    </p>
 
-                    <span>or</span>
+                    <span className="text-sm text-gray-400">or</span>
 
-                    <a href="minecraft:?addExternalServer=Vortex%20Network%20[1.21]%7Cbedrock.vortexnetwork.net:19132">
-                      Add To Bedrock
-                    </a>
-                  </p>
+                    <p className="group cursor-pointer flex items-center gap-1.5">
+                      <div className="bg-green-600 text-white rounded-full px-2 text-sm -mr-0.25">Bedrock</div>
+                      {fullData.ip}
+                      <Copy size={14} className="-mb-[1px] group-hover:scale-125" />
+                    </p>
+                  </div>
                 </div>
 
                 <div className="ml-auto flex flex-col gap-0.25 items-end">

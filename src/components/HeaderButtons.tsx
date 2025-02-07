@@ -26,6 +26,12 @@ export default function HeaderButtons() {
         <div className='ml-auto flex gap-12'>
             <Button variant="link" size="headerLink" className='text-white' asChild>
                 <a href="popular">
+                    Discover
+                </a>
+            </Button>
+
+            <Button variant="link" size="headerLink" className='text-white' asChild>
+                <a href="popular">
                     Most Popular
                 </a>
             </Button>
