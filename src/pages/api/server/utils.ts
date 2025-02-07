@@ -3,7 +3,7 @@ import { and, desc, eq, inArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
 
 
-export async function getServerDetails(env: any, whereClause: any, limit: number = 100) {
+export async function getServerDetails(env: any, whereClause: any, orderByStatements: any, limit: number = 100) {
 
     // NOTE: A servers mode will be ommited if it has no tags.  This should never happen in prod though.
 
@@ -28,7 +28,7 @@ export async function getServerDetails(env: any, whereClause: any, limit: number
         .where(
             whereClause
         )
-        .orderBy(...getServerQueryOrder())
+        .orderBy(...(orderByStatements || getServerQueryOrder()))
         .limit(limit);
     
 
@@ -87,6 +87,8 @@ export type ServerCardDetails = {
     versionEnd: string,
     logoUrl: string,
     bannerUrl: string,
+    lastUpdated: number,
+    created: number,
 }
 
 export type ServerModeType = {

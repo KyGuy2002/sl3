@@ -173,6 +173,10 @@ export default function ServerDetailsPage(props: {id: string}) {
           <Card className="mt-2">
             <div className="p-4">
               <p className="text-gray-500 text-xl font-semibold markdown-style"><Markdown>{fullData.desc}</Markdown></p>
+              <div className="mt-[20px] text-gray-600 text-xs flex gap-8">
+                <p>Last Updated: <span className="font-semibold text-black">{new Date(fullData.lastUpdated).toDateString()}</span></p>
+                <p>Created: <span className="font-semibold text-black">{new Date(fullData.created).toDateString()}</span></p>
+              </div>
             </div>
           </Card>
 

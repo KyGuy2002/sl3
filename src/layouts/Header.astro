@@ -1,5 +1,4 @@
 ---
-import HeaderButtons from "@/components/HeaderButtons";
 import LoginHeaderButton from "@/components/login/LoginHeaderButton";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { ChartNoAxesCombined, Clock, Earth } from "lucide-react";
@@ -24,14 +23,14 @@ import { Search } from "lucide-react";
             <Earth size={18} className="ml-1"/>
         </a>
 
-        <a href='/'
+        <a href='/results?sort=most_players'
             class='flex items-center gap-1 cursor-pointer font-medium text-[18px] border-b-2 border-transparent hover:border-white'
         >
             Trending
             <ChartNoAxesCombined size={18} className="ml-1"/>
         </a>
 
-        <a href='/'
+        <a href='/results?sort=new_created'
             class='flex items-center gap-1 cursor-pointer font-medium text-[18px] border-b-2 border-transparent hover:border-white'
         >
             New Releases

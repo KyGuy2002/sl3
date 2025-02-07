@@ -56,7 +56,7 @@ function Handle(props: {platform: "java" | "bedrock"}) {
 
             <ChipBtn key={"platform"} name={capitalizeFirstLetter(props.platform)} type="swap"
               className={(props.platform == "java" ?
-                " border border-gray-400 text-black hover:bg-gray-300" :
+                "bg-gray-300 border border-gray-400 text-black hover:bg-gray-300" :
                 getTagColor(props.platform.toUpperCase()) + " hover:bg-green-700"
               )}
               onClick={() => {
@@ -67,21 +67,27 @@ function Handle(props: {platform: "java" | "bedrock"}) {
               }}
             />
 
-            <ChipDivider/>
+            {modeDetails && <>
 
-            {modeDetails && <Chip key={"mode"} name={modeDetails.name} hideX={true} onClose={() => {
-              // Make start over button shake
-              document.querySelector('.id-ref-start-over')!.classList.add('animate-shake');
-              setTimeout(() => document.querySelector('.id-ref-start-over')!.classList.remove('animate-shake'), 500);
-            }}/>}
+              <ChipDivider/>
 
-            {tagDetails && tagDetails.length > 0 && <ChipDivider/>}
+              <Chip key={"mode"} name={modeDetails.name} hideX={true} onClose={() => {
+                // Make start over button shake
+                document.querySelector('.id-ref-start-over')!.classList.add('animate-shake');
+                setTimeout(() => document.querySelector('.id-ref-start-over')!.classList.remove('animate-shake'), 500);
+              }}/>
+
+            </>}
+
+            {modeDetails && <ChipDivider/>}
           
             {tagDetails && tagDetails.map((item: any) => (
   
               <Chip key={item.id} name={item.name} onClose={() => removeTag(item.id)}/>
   
             ))}
+
+            {modeDetails && <ChipBtn name="Add Tags" href={"/search/tags" + window.location.search + "&modeName=" + modeDetails.name} type="plus" className='border border-black bg-gray-200'/>}
   
           </div>
 
@@ -102,6 +108,7 @@ function Handle(props: {platform: "java" | "bedrock"}) {
                   interestedModeId={new URLSearchParams(window.location.search).get("mode") || undefined}
                   interestedTagIds={new URLSearchParams(window.location.search).get("tags")?.split(',')}
                   interestedPlatform={props.platform}
+                  interestedPlayerCount={new URLSearchParams(window.location.search).get("sort")?.includes("players")}
                 />
               ))}
             </div>
@@ -136,7 +143,8 @@ function Handle(props: {platform: "java" | "bedrock"}) {
   async function loadServers() {
     const modeId = new URLSearchParams(window.location.search).get("mode");
     const tagIds = new URLSearchParams(window.location.search).get("tags");
-    const response = await fetch(`/api/server/search?mode=${modeId}&tags=${tagIds}&platform=${props.platform}`);
+    const sort = new URLSearchParams(window.location.search).get("sort");
+    const response = await fetch(`/api/server/search?mode=${modeId}&tags=${tagIds}&platform=${props.platform}&sort=${sort}`);
 
     // Split data into 3 cols
     const json: any = await response.json();

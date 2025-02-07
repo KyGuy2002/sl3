@@ -1,4 +1,4 @@
-import { ArrowRightLeft, ChevronLast, ChevronLeft, RotateCcw, X } from "lucide-react";
+import { ArrowRightLeft, ChevronLast, ChevronLeft, Plus, RotateCcw, X } from "lucide-react";
 import { Card } from "./ui/card";
 import classNames from "classnames";
 
@@ -24,7 +24,7 @@ export function ChipBtn(props: {
     name: string,
     href?: string,
     onClick?: () => void,
-    type: "back" | "start-over" | "swap"
+    type: "back" | "start-over" | "swap" | "plus"
     className?: string,
 }) {
     return (
@@ -40,6 +40,7 @@ export function ChipBtn(props: {
 
             {props.type == "start-over" && <RotateCcw size={14} strokeWidth={3} className="ml-[2px] -mr-[2px]"/>}
             {props.type == "swap" && <ArrowRightLeft size={14} strokeWidth={3} className="ml-[2px] -mr-[2px]"/>}
+            {props.type == "plus" && <Plus size={14} strokeWidth={3} className="ml-[2px] -mr-[2px]"/>}
 
         </a>
     )

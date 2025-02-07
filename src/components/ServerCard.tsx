@@ -5,7 +5,7 @@ import {
     HoverCardTrigger,
 } from "@/components/ui/hover-card"
 import TagCardContent from "./TagCardContent";
-import { Blocks, Circle, Copy, Drill, FerrisWheel, SwatchBook } from "lucide-react";
+import { Blocks, Circle, Copy, Drill, FerrisWheel, SwatchBook, Users } from "lucide-react";
 import type { ModeDetailsType, ServerCardDetails, ServerModeType, TagDetailsType } from "@/pages/api/server/utils";
 import { useEffect, useState } from "react";
 import classNames from "classnames";
@@ -18,9 +18,10 @@ export default function ServerCard(props: {
     interestedModeId?: string,
     interestedTagIds?: string[],
     interestedPlatform?: "java" | "bedrock",
+    interestedPlayerCount?: boolean,
 }) {
 
-    const [displayedDetails, setDisplayedDetails] = useState<DisplayedDetailsType>(getDisplayedDetails());
+    const [displayedDetails] = useState<DisplayedDetailsType>(getDisplayedDetails());
 
     return (
         <a
@@ -45,9 +46,14 @@ export default function ServerCard(props: {
 
                         <img src={props.data.logoUrl || undefined} alt={`${props.data.name} Minecraft Server Logo`} className="w-[55px] rounded-xl aspect-square object-cover"/>
 
-                        <div className='m-0'>
+                        <div className='m-0 w-full'>
 
-                            <p className='font-bold text-[19px] m-0'>{props.data.name}</p>
+                            <p className='font-bold text-[19px] m-0 flex items-center justify-between'>
+                                {props.data.name}
+                                {props.interestedPlayerCount &&
+                                    <span className="flex items-center gap-1 text-[16px] text-gray-800 font-medium">{props.data.onlinePlayers} <Users size={16}/> </span>
+                                }
+                            </p>
                             <p className='group hover:gap-4 transition-transform ease-linear duration-200 text-gray-500 m-0 text-[14.5px] -mt-[2px] flex items-center gap-1.5 border-b-transparent border-b-[1px] h-4 hover:border-b-gray-400'
                                 onClick={() => navigator.clipboard.writeText(getDisplayedIp()!)}
                             >

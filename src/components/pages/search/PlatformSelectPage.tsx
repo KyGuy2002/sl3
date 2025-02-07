@@ -8,7 +8,7 @@ export default function PlatformSelectPage() {
     <>
 
       <PageTitle
-        title='Step 1. Select Platform'
+        title='Select Platform'
         desc={<>
           Let us know which <HighlightCard text='Platform' className="bg-gray-400"/> you're using to get started.
         </>}
