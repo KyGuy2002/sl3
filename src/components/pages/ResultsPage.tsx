@@ -101,6 +101,7 @@ function Handle(props: {platform: "java" | "bedrock"}) {
                   hideModeName={true}
                   interestedModeId={new URLSearchParams(window.location.search).get("mode") || undefined}
                   interestedTagIds={new URLSearchParams(window.location.search).get("tags")?.split(',')}
+                  interestedPlatform={props.platform}
                 />
               ))}
             </div>
@@ -135,7 +136,7 @@ function Handle(props: {platform: "java" | "bedrock"}) {
   async function loadServers() {
     const modeId = new URLSearchParams(window.location.search).get("mode");
     const tagIds = new URLSearchParams(window.location.search).get("tags");
-    const response = await fetch(`/api/server/search?mode=${modeId}&tags=${tagIds}`);
+    const response = await fetch(`/api/server/search?mode=${modeId}&tags=${tagIds}&platform=${props.platform}`);
 
     // Split data into 3 cols
     const json: any = await response.json();

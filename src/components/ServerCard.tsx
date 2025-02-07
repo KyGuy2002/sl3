@@ -17,6 +17,7 @@ export default function ServerCard(props: {
     hideModeName?: boolean,
     interestedModeId?: string,
     interestedTagIds?: string[],
+    interestedPlatform?: "java" | "bedrock",
 }) {
 
     const [displayedDetails, setDisplayedDetails] = useState<DisplayedDetailsType>(getDisplayedDetails());
@@ -48,8 +49,12 @@ export default function ServerCard(props: {
 
                             <p className='font-bold text-[19px] m-0'>{props.data.name}</p>
                             <p className='group hover:gap-4 transition-transform ease-linear duration-200 text-gray-500 m-0 text-[14.5px] -mt-[2px] flex items-center gap-1.5 border-b-transparent border-b-[1px] h-4 hover:border-b-gray-400'>
-                                {props.data.javaIp || props.data.bedrockIp}
-                                {/* TODO show depending on filter/setting? */}
+                                
+                                {/* Interested platform, else whatever it has (java has priority) */}
+                                {(props.interestedPlatform == 'java' && props.data.javaIp)}
+                                {(props.interestedPlatform == 'bedrock' && props.data.bedrockIp)}
+                                {(!props.interestedPlatform && (props.data.javaIp || props.data.bedrockIp))}
+       
                                 {/* TODO better hover and click animation */}
                                 <Copy size={11} className="-mb-1 group-hover:scale-125" />
                             </p>

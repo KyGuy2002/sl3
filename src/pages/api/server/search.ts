@@ -1,6 +1,6 @@
 import { serverModesTable, serverModesTagsTable, serversTable } from "@/db/schema";
 import type { APIContext } from "astro";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, isNotNull } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
 import { getServerDetails } from "./utils";
 
@@ -8,12 +8,14 @@ import { getServerDetails } from "./utils";
 export async function GET({ params, request, locals }: APIContext) {
   
   const mode = new URL(request.url).searchParams.get("mode");
+  const platform = new URL(request.url).searchParams.get("platform");
   const rawTags = new URL(request.url).searchParams.get("tags");
   const tags = ((rawTags && rawTags != "null") ? rawTags.split(",") : []);
 
   // TODO allow any combo
   // TODO add text search
-  if (!mode) return new Response("Missing parameters.", { status: 400 });
+  if (!mode || !platform) return new Response("Missing parameters. (mode, platform)", { status: 400 });
+  if (platform != "java" && platform != "bedrock") return new Response("Invalid platform. (java, bedrock)", { status: 400 });
 
 
   const tagsStatement = [];
@@ -34,6 +36,7 @@ export async function GET({ params, request, locals }: APIContext) {
         eq(serverModesTable.modeId, mode),
         ...tagsStatement,
         eq(serversTable.online, true),
+        ...(platform == "bedrock" ? [isNotNull(serversTable.bedrockIp)] : [isNotNull(serversTable.javaIp)]),
       )
     )
     .groupBy(serversTable.id);
