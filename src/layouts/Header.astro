@@ -1,6 +1,9 @@
 ---
 import HeaderButtons from "@/components/HeaderButtons";
 import LoginHeaderButton from "@/components/login/LoginHeaderButton";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { ChartNoAxesCombined, Clock, Earth } from "lucide-react";
+import { Search } from "lucide-react";
 
 
 ---
@@ -12,14 +15,41 @@ import LoginHeaderButton from "@/components/login/LoginHeaderButton";
 
 
 
-    {/* <Button variant="header" className='ml-auto' asChild>
-        <a href="/search">
-            <Binoculars strokeWidth={2.5} />
-            Find Another Server
-        </a>
-    </Button> */}
+    <div class='ml-auto flex gap-14'>
 
-    <HeaderButtons client:only />
+        <a href='/'
+            class='flex items-center gap-1 cursor-pointer font-medium text-[18px] border-b-2 border-transparent hover:border-white'
+        >
+            Discover
+            <Earth size={18} className="ml-1"/>
+        </a>
+
+        <a href='/'
+            class='flex items-center gap-1 cursor-pointer font-medium text-[18px] border-b-2 border-transparent hover:border-white'
+        >
+            Trending
+            <ChartNoAxesCombined size={18} className="ml-1"/>
+        </a>
+
+        <a href='/'
+            class='flex items-center gap-1 cursor-pointer font-medium text-[18px] border-b-2 border-transparent hover:border-white'
+        >
+            New Releases
+            <Clock size={18} className="ml-1"/>
+        </a>
+
+    </div>
+
+    <a class="ml-auto" href="/search">
+        <Button
+            variant="secondary"
+            size="header"
+            className='bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold hover:from-blue-600 hover:to-purple-700'
+        >
+            <Search strokeWidth={3}/>
+            Search
+        </Button>
+    </a>
 
     <LoginHeaderButton client:load/>
 </div>

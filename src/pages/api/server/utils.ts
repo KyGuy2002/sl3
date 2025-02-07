@@ -75,7 +75,8 @@ export function getServerQueryOrder() { // TODO does drizzle read both items cor
 export type ServerCardDetails = {
     id: string,
     name: string,
-    ip: string,
+    javaIp?: string,
+    bedrockIp?: string,
     desc: string,
     modes: [
       ServerModeType

@@ -5,7 +5,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card"
-import TagCardContent from "../TagCardContent";
+import TagCardContent, { getTagColor } from "../TagCardContent";
 import { getIcon } from "../ServerCard";
 import { Button } from "../ui/button";
 import { BookText, Copy, Globe, Mail, MessageCircleWarning, ShoppingBasket, Video } from "lucide-react";
@@ -59,26 +59,30 @@ export default function ServerDetailsPage(props: {id: string}) {
             <div className="p-4">
 
 
-              <div className="flex gap-4 mb-4 items-center">
+              <div className="flex gap-4 mb-3 items-center">
 
                 <img src={fullData.logoUrl} alt={`${fullData.name} Minecraft Server Logo`} className="w-[65px] rounded-xl aspect-square object-cover"/>
 
                 <div>
                   <h1 className="text-4xl font-bold">{fullData.name}</h1>
                   <div className="text-gray-500 text-xl font-semibold flex items-center gap-3">
-                    <p className="group cursor-pointer flex items-center gap-1.5">
-                      <div className="bg-gray-300 rounded-full px-2 text-sm -mr-0.25">Java</div>
-                      {fullData.ip}
-                      <Copy size={14} className="-mb-[1px] group-hover:scale-125" />
-                    </p>
+                    {fullData.javaIp &&
+                      <p className="group cursor-pointer flex items-center gap-1.5">
+                        <div className={"rounded-full px-2 text-sm -mr-0.25 " + getTagColor("JAVA")}>Java</div>
+                        {fullData.javaIp}
+                        <Copy size={14} className="-mb-[1px] group-hover:scale-125" />
+                      </p>
+                    }
 
-                    <span className="text-sm text-gray-400">or</span>
+                    {fullData.javaIp && fullData.bedrockIp && <span className="text-sm text-gray-400">or</span>}
 
-                    <p className="group cursor-pointer flex items-center gap-1.5">
-                      <div className="bg-green-600 text-white rounded-full px-2 text-sm -mr-0.25">Bedrock</div>
-                      {fullData.ip}
-                      <Copy size={14} className="-mb-[1px] group-hover:scale-125" />
-                    </p>
+                    {fullData.bedrockIp &&
+                      <p className="group cursor-pointer flex items-center gap-1.5">
+                        <div className={"rounded-full px-2 text-sm -mr-0.25 " + getTagColor("BEDROCK")}>Bedrock</div>
+                        {fullData.bedrockIp}
+                        <Copy size={14} className="-mb-[1px] group-hover:scale-125" />
+                      </p>
+                    }
                   </div>
                 </div>
 
@@ -163,7 +167,6 @@ export default function ServerDetailsPage(props: {id: string}) {
               </div>
 
             </div>
-
 
           </Card>
 

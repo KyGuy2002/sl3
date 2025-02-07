@@ -48,7 +48,8 @@ export default function ServerCard(props: {
 
                             <p className='font-bold text-[19px] m-0'>{props.data.name}</p>
                             <p className='group hover:gap-4 transition-transform ease-linear duration-200 text-gray-500 m-0 text-[14.5px] -mt-[2px] flex items-center gap-1.5 border-b-transparent border-b-[1px] h-4 hover:border-b-gray-400'>
-                                {props.data.ip}
+                                {props.data.javaIp || props.data.bedrockIp}
+                                {/* TODO show depending on filter/setting? */}
                                 {/* TODO better hover and click animation */}
                                 <Copy size={11} className="-mb-1 group-hover:scale-125" />
                             </p>
@@ -68,26 +69,14 @@ export default function ServerCard(props: {
                         <div className='grid grid-cols-2 gap-1.5 ml-[2px]'>
                             {displayedDetails.tags.map((t) => (
 
-                                <p key={t.id} className={classNames('flex text-[14px] items-center gap-1 capitalize', {
-                                    ['text-gray-400 font-[500]']: props.interestedTagIds?.includes(t.id),
-                                    ['text-gray-700 font-semibold']: !props.interestedTagIds?.includes(t.id),
+                                <p key={t.id} className={classNames('flex text-[14px] items-center gap-1 font-semibold', {
+                                    ['text-gray-500']: props.interestedTagIds?.includes(t.id),
+                                    ['text-gray-700']: !props.interestedTagIds?.includes(t.id),
                                 })}>
                                     {getIcon(t.type)}
                                     {t.name}
                                 </p>
 
-                                // TODO fix this hover card (a nesting)
-                                // <HoverCard key={t.id}>
-                                //     <HoverCardTrigger>
-                                //         <p key={t.id} className="flex font-semibold text-gray-700 text-[14px] items-center gap-1 capitalize">
-                                //             {getIcon(t.type)}
-                                //             {t.name}
-                                //         </p>
-                                //     </HoverCardTrigger>
-                                //     <HoverCardContent>
-                                //         <TagCardContent data={t}/>
-                                //     </HoverCardContent>
-                                // </HoverCard>
                             ))}
                         </div>
                     </div>

@@ -1,9 +1,27 @@
 import { useState, useEffect } from 'react';
 import ServerCard from '../ServerCard'; // Make sure to import ServerCard
-import TagBubbleCard from '../TagBubbleCard';
 import type { TagDetailsType } from '@/pages/api/server/utils';
+import PageTitle from './search/PageTitle';
+import Chip, { ChipDivider, ChipBtn } from '../Chip';
+import { capitalizeFirstLetter } from '@/components/utils';
+import { getTagColor } from '../TagCardContent';
+
 
 export default function ResultsPage() {
+
+  const platform = localStorage.getItem("platform");
+
+  if (!platform || (platform != "java" && platform != "bedrock")) {
+    window.location.href = '/search/platform' + window.location.search;
+    return <></>;
+  }
+
+  return <Handle platform={platform}/>
+
+}
+
+
+function Handle(props: {platform: "java" | "bedrock"}) {
 
   const [data, setData] = useState<any[][] | -1>();
   const [modeDetails, setModeDetails] = useState<any>();
@@ -25,14 +43,43 @@ export default function ResultsPage() {
     <>
 
         <div className=''>
-          <h1 className="text-3xl font-bold">Showing Results For:</h1>
-          <span className='font-bold'>Gamemode: </span> {modeDetails && modeDetails.name}
+          <PageTitle
+            title="Search Results"
+            desc="Heres what we found for your search."
+          />
 
-          <div className='mb-3 flex gap-2'>
+          <div className='mb-3 -mt-4 flex gap-2 items-center'>
+
+            <ChipBtn name="Start Over" href="/search" type="start-over" className='bg-red-500 text-white hover:bg-red-600 id-ref-start-over'/>
+
+            <ChipDivider/>
+
+            <ChipBtn key={"platform"} name={capitalizeFirstLetter(props.platform)} type="swap"
+              className={(props.platform == "java" ?
+                " border border-gray-400 text-black hover:bg-gray-300" :
+                getTagColor(props.platform.toUpperCase()) + " hover:bg-green-700"
+              )}
+              onClick={() => {
+                localStorage.setItem("platform", props.platform == "java" ? "bedrock" : "java");
+                const searchParams = new URLSearchParams(window.location.search);
+                searchParams.set("platform", props.platform == "java" ? "bedrock" : "java");
+                window.location.href = '/results?' + searchParams.toString();
+              }}
+            />
+
+            <ChipDivider/>
+
+            {modeDetails && <Chip key={"mode"} name={modeDetails.name} hideX={true} onClose={() => {
+              // Make start over button shake
+              document.querySelector('.id-ref-start-over')!.classList.add('animate-shake');
+              setTimeout(() => document.querySelector('.id-ref-start-over')!.classList.remove('animate-shake'), 500);
+            }}/>}
+
+            {tagDetails && tagDetails.length > 0 && <ChipDivider/>}
           
             {tagDetails && tagDetails.map((item: any) => (
   
-              <TagBubbleCard key={item.id} data={item} onClose={() => undefined}/>
+              <Chip key={item.id} name={item.name} onClose={() => removeTag(item.id)}/>
   
             ))}
   
@@ -61,7 +108,7 @@ export default function ResultsPage() {
           ))}
 
           {data == -1 &&
-            <div className='mx-auto text-center mt-10'>
+            <div className='mx-auto text-center mt-20'>
               <h3 className='text-xl font-medium'>No results found</h3>
               <p className='text-lg'>Try removing or swapping some filters</p>
             </div>
@@ -71,6 +118,17 @@ export default function ResultsPage() {
 
     </>
   )
+
+
+  function removeTag(tagId: string) {
+    const tagIds = new URLSearchParams(window.location.search).get("tags")?.split(',');
+    const newTagIds = tagIds?.filter((id) => id != tagId);
+
+    const searchParams = new URLSearchParams(window.location.search);
+    searchParams.set("tags", newTagIds!.join(','));
+
+    window.location.search = searchParams.toString();
+  }
 
 
 

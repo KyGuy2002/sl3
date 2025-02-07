@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
-import { ArrowBigRight, ChevronRight, SearchIcon } from 'lucide-react';
+import { ArrowBigRight, ChevronLeft, ChevronRight, SearchIcon } from 'lucide-react';
 import classNames from 'classnames';
-import TagCardContent, { getColorConditions } from './TagCardContent';
+import TagCardContent, { getColorConditions, getTagColor } from './TagCardContent';
 import { Card } from './ui/card';
-import TagBubbleCard from './TagBubbleCard';
 import type { TagDetailsType } from '@/pages/api/server/utils';
 import { Button } from './ui/button';
+import Chip, { ChipDivider, ChipBtn } from './Chip';
 
 export default function ItemSearch(props: {
   defaultEndpoint: string,
@@ -14,6 +14,8 @@ export default function ItemSearch(props: {
   onNext: (selected: TagDetailsType[]) => void,
   onlyOne?: boolean,
   allowSkip?: boolean,
+  backBtn?: boolean,
+  prevCategoryLabel?: string,
 }) {
 
   const abortRef = useRef<AbortController>(null);
@@ -71,11 +73,27 @@ export default function ItemSearch(props: {
     <div>
 
 
-        <div className='mb-4 flex gap-2'>
+        <div className='mb-4 flex gap-2 items-center'>
+
+          {props.backBtn && <>
+            
+            <ChipBtn name="Back" href="/search" type="back" className='bg-red-500 text-white hover:bg-red-600'/>
+
+          </>}
+
+          {props.prevCategoryLabel && <>
+
+            <ChipDivider/>
+          
+            <Chip key={"mode"} name={props.prevCategoryLabel} hideX={true}/>
+
+          </>}
+
+          {selected.length > 0 && (props.backBtn || props.prevCategoryLabel) && <ChipDivider/>}
 
           {selected.map((item) => (
 
-            <TagBubbleCard key={item.id} data={item} onClose={() => remove(item)}/>
+            <Chip key={item.id} name={item.name} onClose={() => remove(item)}/>
 
           ))}
 
@@ -120,7 +138,7 @@ export default function ItemSearch(props: {
             <div>
               <Button
                 disabled={!props.allowSkip && selected.length == 0}
-                className='max-w-[250px] min-w-[150px] w-[15vw] h-full rounded-2xl bg-green-600 border-[3px] border-green-700 hover:bg-green-700 hover:border-green-800 font-semibold tracking-wide text-lg'
+                className='max-w-[250px] min-w-[150px] w-[15vw] h-full rounded-2xl bg-green-600 hover:bg-green-700 font-semibold tracking-wide text-xl'
                 // TODO does it actually prevent from clicking when disabled?
                 onClick={() => props.onNext(selected)}
               >
@@ -251,30 +269,55 @@ export default function ItemSearch(props: {
     return (
       <div className="flex flex-wrap gap-2">
         {localProps.items.map((item: any) => (
-          <Card key={item.id} className={classNames('relative px-4 py-2 cursor-pointer border-2 border-transparent hover:border-gray-400 grow flex flex-col justify-between', {
-            'hover:bg-gray-50': !selected.includes(item),  
-            'opacity-[0.7]': localProps.gray,
-              'outline outline-1 outline-gray-700': localProps.highlight,
-              'outline outline-[3.5px] outline-gray-400': getFirstItem() === item && data != defData,
-              ...(selected.includes(item) ? getColorConditions(item.type, true) : {})
-            })}
+          <TagCard
+            data={item}
+            selected={selected.includes(item)}
+            quickAdd={getFirstItem() === item && data != defData}
+            grayed={localProps.gray}
+            highlighted={localProps.highlight}
             onClick={() => localProps.onClick(item)}
-          >
-            <TagCardContent key={item.id} data={item}/>
-
-            {getFirstItem() === item && data != defData && <p
-              className='absolute right-1 bottom-1 bg-gray-400 rounded-md text-[10px] font-bold text-white px-[5px] py-0.5
-              flex items-center gap-[0.5px] pr-[2.5px]'
-            >
-              ENTER
-              <ArrowBigRight size={15} strokeWidth={2.2}/>  
-            </p>}
-
-          </Card>
+            className={classNames('', {
+              [getTagColor(item.type, true)]: selected.includes(item)
+            })}
+          />
         ))}
       </div>
     )
   }
 
 
+}
+
+
+
+export function TagCard(props: {
+  data: TagDetailsType,
+  selected: boolean,
+  quickAdd: boolean,
+  grayed: boolean,
+  highlighted: boolean,
+  onClick: () => void,
+  className?: string,
+}) {
+  return (
+    <Card key={props.data.id} className={classNames('relative px-4 py-2 cursor-pointer border-2 border-transparent hover:border-gray-400 grow flex flex-col justify-between ' + props.className, {
+      'hover:bg-gray-50': !props.selected,  
+      'opacity-[0.7]': props.grayed,
+        'outline outline-1 outline-gray-700': props.highlighted,
+        'outline outline-[3.5px] outline-gray-400': props.quickAdd,
+      })}
+      onClick={props.onClick}
+    >
+      <TagCardContent key={props.data.id} data={props.data}/>
+
+      {props.quickAdd && <p
+        className='absolute right-1 bottom-1 bg-gray-400 rounded-md text-[10px] font-bold text-white px-[5px] py-0.5
+        flex items-center gap-[0.5px] pr-[2.5px]'
+      >
+        ENTER
+        <ArrowBigRight size={15} strokeWidth={2.2}/>  
+      </p>}
+
+    </Card>
+  )
 }

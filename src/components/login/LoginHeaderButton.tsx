@@ -12,7 +12,7 @@ export default function LoginHeaderButton() {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button variant="secondary" size="header" className='ml-auto'><img src="/icons/passkey.svg" className='h-4'/>  Login</Button>
+                <Button variant="secondary" size="header" className='ml-4'><img src="/icons/passkey.svg"/>  Login</Button>
             </DialogTrigger>
             <DialogContent>
                 <LoginDialog/>

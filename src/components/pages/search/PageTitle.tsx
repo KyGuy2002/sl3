@@ -1,4 +1,4 @@
-export default function SearchPageTitle(props: {title: string, desc: any}) {
+export default function PageTitle(props: {title: string, desc: any}) {
 return (
     <>
         <h1 className='mt-8 text-4xl font-bold'>{props.title}</h1>

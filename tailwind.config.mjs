@@ -56,13 +56,19 @@ export default {
 				}
     		},
 			animation: {
-				tilt: 'tilt 3s linear infinite'
+				tilt: 'tilt 3s linear infinite',
+				shake: 'shake 0.3s ease-in-out',
 			},
 			  keyframes: {
 				tilt: {
 				  '0%, 50%, 100%': { transform: 'rotate(0deg)' },
 				  '25%': { transform: 'rotate(1.5deg)' },
 				  '75%': { transform: 'rotate(-1.5deg)' }
+				},
+				shake: {
+				  '0%, 100%': { transform: 'translateX(0)' },
+				  '10%, 50%, 90%': { transform: 'translateX(-4px)' },
+				  '30%, 70%': { transform: 'translateX(4px)' }
 				}
 			},
     	}

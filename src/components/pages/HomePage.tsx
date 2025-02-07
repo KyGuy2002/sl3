@@ -27,33 +27,33 @@ export default function HomePage() {
 
 
         {/* Featured Filters */}
-        <div className='flex gap-4'>
+        <div className='grid gap-4 grid-cols-4'>
 
           <PresetCard
             name="Creative Servers"
             desc='Click to filter'
-            href="/search?mode=creative"
+            href="/results?mode=01949633-064a-76ed-872d-5c531080990a"
             image="/images/temp/1.png"
           />
 
           <PresetCard
             name="Survival Servers"
             desc='Click to filter'
-            href="/search?mode=creative"
+            href="/results?mode=01949635-ff1c-748d-826f-91117fa99a8d"
             image="/images/temp/2.png"
           />
 
           <PresetCard
-            name="Skyblock Servers"
+            name="PvP Servers"
             desc='Click to filter'
-            href="/search?mode=creative"
+            href="/results?mode=019496a6-3825-79ce-9e5f-0f78de5e27c1"
             image="/images/temp/3.png"
           />
 
           <PresetCard
-            name="Theme Park Servers"
+            name="Minigame Servers"
             desc='Click to filter'
-            href="/search?mode=creative"
+            href="/results?mode=019496a5-5327-74f0-bde7-28cf374f8f46"
             image="/images/temp/6.png"
           />
 
