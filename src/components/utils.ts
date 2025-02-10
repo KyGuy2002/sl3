@@ -1,3 +1,5 @@
 export function capitalizeFirstLetter(val: string) {
-    return String(val).charAt(0).toUpperCase() + String(val).slice(1);
+    return val.split(" ").map((word: string) => {
+        return word.charAt(0).toUpperCase() + word.slice(1);
+    }).join(" ");
 }

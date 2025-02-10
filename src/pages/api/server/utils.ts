@@ -110,5 +110,11 @@ export type TagDetailsType = {
     name: string,
     desc: string,
     type: string,
-    aka: string[]
+    aka: string[],
+    modeId: string
+}
+
+export type ServerLinkType = {
+    type: "DISCORD" | "WEBSITE" | "FORUM" | "OTHER" | string,
+    url: string
 }

@@ -1,5 +1,8 @@
 import { getOrGenEmbed, runFtsQuery } from "../../queryUtils";
 import { chunk } from 'llm-chunk';
+import DOMPurify from 'isomorphic-dompurify';
+import { marked } from 'marked';
+import type { ServerLinkType } from "../../server/utils";
 
 
 // TODO preset some mappings from foreign to our tags (maybe do it the specific site adapter/utils?)
@@ -113,3 +116,40 @@ export async function getServerShortDesc(env: any, desc: string, mode: { name: s
 }
 
 const descPrompt = "Create a short 30-90 character description of this Minecraft server. It should be detailed and descriptive instead of flashy. Do not include specific details like version, ip, name, commands, etc, instead focus on the overall purpose/selling point. Do not make it generic. Do not include generic words like minecraft, youtube, etc. Only include the raw description, no other output is needed. Do not exceed 90 characters.  Focus on the aspects related to the gamemode: {{MODE}}";
+
+
+/**
+ * Compares links, ignoring scheme, www, and trailing slashes
+ */
+export function linksSame(a: any, b: any) {
+    const clean = (url: string) => url.replace(/(^\w+:|^)\/\//, '').replace("www.", "").replace(/\/$/, "");
+    return clean(a) == clean(b);
+}
+
+export function cleanupLinks(links: ServerLinkType[]): ServerLinkType[] {
+
+    // Remove duplicates
+    links = links.filter((link, index, self) =>
+        index === self.findIndex((t) => (
+            t.url === link.url
+        ))
+    )
+
+    // If store and patreon are the same, remove patreon.
+    if (linksSame(links.find((l) => l.type === "STORE"), links.find((l) => l.type === "PATREON"))) {
+        links.splice(links.findIndex((l) => l.type === "PATREON"), 1);
+    }
+
+    // If there is a patreon but not a store, change patreon to store. (Otherwise leave seperate)
+    if (links.find((l) => l.type === "PATREON") && !links.find((l) => l.type === "STORE")) {
+        links.find((l) => l.type === "PATREON")!.type = "STORE";
+    }
+
+    return links;
+}
+
+
+export function concatPort(platform: "bedrock" | "java", address: string | undefined, port: number | undefined) {
+    if (port && port != (platform == "bedrock" ? 19132 : 25565)) return address?.toLowerCase() + ":" + port;
+    else return address?.toLowerCase();
+}

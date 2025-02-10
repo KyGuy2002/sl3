@@ -8,13 +8,18 @@ export const serversTable = sqliteTable("servers", {
   bedrockIp: text().unique(),
   onlinePlayers: int().notNull(),
   versionStart: text().notNull(),
-  versionEnd: text().notNull(),
+  versionEnd: text(),
   created: int().notNull(),
   lastUpdated: int().notNull(),
   online: int({ mode: 'boolean' }).notNull(),
-
   logoUrl: text(),
   bannerUrl: text(),
+  ipVisible: int({ mode: "boolean" }).notNull(),
+
+  scrapedSource: text(),
+  scrapedTime: int(),
+  scrapedId: text({ mode: "json" }).unique()
+
 });
 
 
@@ -92,4 +97,18 @@ export const passkeyChallengesTable = sqliteTable("passkey_challenges", {
 export const embedCache = sqliteTable("embed_cache", {
   hash: text().notNull().primaryKey(),
   vector: text({ mode: "json" }).notNull(),
+});
+
+
+export const foreignTagMap = sqliteTable("foreign_tag_map", {
+  ourId: text().notNull().references(() => allTagsTable.id),
+  theirId: text().notNull().unique(),
+  website: text().notNull()
+});
+
+
+export const foreignModeMap = sqliteTable("foreign_mode_map", {
+  ourId: text().notNull().references(() => allModesTable.id),
+  theirId: text().notNull().unique(),
+  website: text().notNull()
 });
