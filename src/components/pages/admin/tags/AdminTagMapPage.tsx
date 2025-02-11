@@ -64,7 +64,7 @@ export default function AdminTagMapPage() {
 
         <Button
           variant='destructive'
-          className='w-full mb-4'
+          className='max-w-[800px] w-full mb-4 fixed bottom-0 z-10'
           onClick={save}
         >
           Save <Save/>
@@ -86,9 +86,13 @@ export default function AdminTagMapPage() {
               <TableBody>
                 {theirs[name].map((tag: any) => 
                   <TableRow key={tag.id}>
-                    <TableCell>{tag.name}</TableCell>
                     <TableCell>
-                      <select value={((mapping[name] && mapping[name][tag.id]) ? mapping[name][tag.id] : undefined)} onChange={(e) => {
+                      <p className='font-bold'>{tag.name}</p>
+                      <p className='text-xs'>{tag.description}</p>
+                    </TableCell>
+                    <TableCell>
+                      <select className='bg-gray-300 rounded-full px-3 py-1' 
+                        value={((mapping[name] && mapping[name][tag.id]) ? mapping[name][tag.id] : undefined)} onChange={(e) => {
 
                         const newMapping = { ...mapping };
                         if (!newMapping[name]) newMapping[name] = {};

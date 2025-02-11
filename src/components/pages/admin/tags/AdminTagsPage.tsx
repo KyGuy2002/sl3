@@ -48,7 +48,7 @@ export default function AdminTagsPage() {
 
         <Button
           variant='destructive'
-          className='w-full mb-4'
+          className='max-w-[800px] w-full mb-4 fixed bottom-0'
           onClick={save}
         >
           Save <Save/>
