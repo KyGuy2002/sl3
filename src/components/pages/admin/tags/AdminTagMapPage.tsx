@@ -11,18 +11,6 @@ import {
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Save } from 'lucide-react';
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandSeparator,
-  CommandShortcut,
-} from "@/components/ui/command"
-import { Combobox } from '@/components/ui/combobox';
-import { ComboboxDemo } from '@/components/ui/combobox2';
 
 export default function AdminTagMapPage() {
 

@@ -5,16 +5,18 @@ import cloudflare from '@astrojs/cloudflare';
 
 import react from '@astrojs/react';
 
-import tailwind from '@astrojs/tailwind';
+import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
+
+  output: "server",
   adapter: cloudflare({
     platformProxy: {
       enabled: true
     }
   }),
-  output: "server",
+  
   vite: {
     resolve: {
       // Use react-dom/server.edge instead of react-dom/server.browser for React 19.
@@ -23,12 +25,11 @@ export default defineConfig({
         "react-dom/server": "react-dom/server.edge",
       },
     },
+
+    plugins: [tailwindcss()],
   },
 
   integrations: [
     react(),
-    tailwind({
-      applyBaseStyles: false,
-    })
   ],
 });
