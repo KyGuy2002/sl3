@@ -3,7 +3,6 @@ import type { ModeDetailsType, TagDetailsType } from '@/pages/api/server/utils';
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -12,6 +11,18 @@ import {
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Save } from 'lucide-react';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+  CommandShortcut,
+} from "@/components/ui/command"
+import { Combobox } from '@/components/ui/combobox';
+import { ComboboxDemo } from '@/components/ui/combobox2';
 
 export default function AdminTagMapPage() {
 
@@ -91,7 +102,26 @@ export default function AdminTagMapPage() {
                       <p className='text-xs'>{tag.description}</p>
                     </TableCell>
                     <TableCell>
-                      <select className='bg-gray-300 rounded-full px-3 py-1' 
+
+                      <Combobox
+                        placeholder='NONE SELECTED'
+                        searchPrompt='Search for a tag...'
+                        value={((mapping[name] && mapping[name][tag.id]) ? mapping[name][tag.id] : undefined)}
+                        setValue={(v) => {
+
+                          const newMapping = { ...mapping };
+                          if (!newMapping[name]) newMapping[name] = {};
+                          newMapping[name][tag.id] = v;
+                          setMapping(newMapping);
+  
+                        }}
+                        items={[
+                          ...tags.map((a) => ({ value: a.id, label: a.name, isMode: false, parentName: modes.find((m) => m.id == a.modeId)?.name })),
+                          ...modes.map((a) => ({ value: a.id, label: a.name, isMode: true })),
+                        ]}
+                      />
+
+                      {/* <select className='bg-gray-300 rounded-full px-3 py-1' 
                         value={((mapping[name] && mapping[name][tag.id]) ? mapping[name][tag.id] : undefined)} onChange={(e) => {
 
                         const newMapping = { ...mapping };
@@ -107,7 +137,7 @@ export default function AdminTagMapPage() {
                         {modes.map((a) => 
                           <option key={a.id} value={a.id}>{a.name} (mode)</option>
                         )}
-                      </select>
+                      </select> */}
                     </TableCell>
                   </TableRow>
                 )}

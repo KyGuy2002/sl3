@@ -101,14 +101,7 @@ export const embedCache = sqliteTable("embed_cache", {
 
 
 export const foreignTagMap = sqliteTable("foreign_tag_map", {
-  ourId: text().notNull().references(() => allTagsTable.id),
-  theirId: text().notNull().unique(),
-  website: text().notNull()
-});
-
-
-export const foreignModeMap = sqliteTable("foreign_mode_map", {
-  ourId: text().notNull().references(() => allModesTable.id),
+  ourId: text().notNull(), // TODO references here?
   theirId: text().notNull().unique(),
   website: text().notNull()
 });

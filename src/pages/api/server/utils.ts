@@ -92,11 +92,12 @@ export type ServerCardDetails = {
 }
 
 export type ServerModeType = {
+    id: string,
     details: ModeDetailsType,
     cardDesc: string,
     fullDesc: string,
     tags: TagDetailsType[]
-  }
+}
 
 export type ModeDetailsType = {
     id: string,

@@ -7,12 +7,9 @@ import _ from "lodash";
 export async function GET({ params, request, locals }: APIContext) {
 
     const res = await drizzle(locals.runtime.env.DB).select().from(foreignTagMap);
-    const res2 = await drizzle(locals.runtime.env.DB).select().from(foreignModeMap);
-
-    const all = [...res, ...res2];
 
     const obj: any = {};
-    for (const item of all) {
+    for (const item of res) {
         if (!obj[item.website]) obj[item.website] = {};
         obj[item.website][item.theirId] = item.ourId;
     }
@@ -25,12 +22,7 @@ export async function GET({ params, request, locals }: APIContext) {
 export async function POST({ params, request, locals }: APIContext) {
     const body: any = await request.json();
 
-    // Get current
-    const tagRes = await drizzle(locals.runtime.env.DB).select().from(allTagsTable);
-    const modeRes = await drizzle(locals.runtime.env.DB).select().from(allModesTable);
-
     const newTagMap = [];
-    const newModeMap = [];
 
     // TODO allow delete mapping
 
@@ -39,26 +31,22 @@ export async function POST({ params, request, locals }: APIContext) {
         for (const theirId of Object.keys(body[site])) {
             const ourId = body[site][theirId];
 
-            // OurId exists in allTags
-            if (tagRes.find((x) => x.id == ourId)) newTagMap.push({ website: site, theirId, ourId });
-
-            // OurId exists in allModes
-            else if (modeRes.find((x) => x.id == ourId)) newModeMap.push({ website: site, theirId, ourId });
-
-            else throw new Error(`OurId ${ourId} does not exist in allTags or allModes!`);
+            newTagMap.push({ website: site, theirId, ourId });
 
         }
     }
 
     // Note: the length checker is only needed when the db is completely empty the first time.
+    if (newTagMap.length == 0) return new Response("Success!");
 
     // Delete all
-    if (newModeMap.length > 0) await drizzle(locals.runtime.env.DB).delete(foreignModeMap);
-    if (newTagMap.length > 0) await drizzle(locals.runtime.env.DB).delete(foreignTagMap);
+    await drizzle(locals.runtime.env.DB).delete(foreignTagMap);
 
     // Insert new
-    if (newModeMap.length > 0) await drizzle(locals.runtime.env.DB).insert(foreignModeMap).values(newModeMap);
-    if (newTagMap.length > 0) await drizzle(locals.runtime.env.DB).insert(foreignTagMap).values(newTagMap);
+    // Batches of 15
+    for (let i = 0; i < newTagMap.length; i += 15) {
+        await drizzle(locals.runtime.env.DB).insert(foreignTagMap).values(newTagMap.slice(i, i + 15));
+    }
 
     return new Response("Success!");
 

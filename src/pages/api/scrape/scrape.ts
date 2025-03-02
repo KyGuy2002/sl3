@@ -2,32 +2,42 @@ import { serverModesTable, serversTable } from "@/db/schema";
 import type { APIContext } from "astro";
 import { drizzle } from "drizzle-orm/d1";
 import { getIdList, getServerDetails } from "./utils/findmcUtils";
+import { toNumber } from "lodash";
+import { eq } from "drizzle-orm";
 
 
 export async function GET({ params, request, locals }: APIContext) {
+    const page = toNumber(new URL(request.url).searchParams.get("page") || 0);
+    
     const servers: any = [];
     const serverModes: any = [];
 
-    const no1 = Math.floor(Math.random() * 10);
-    const res = await getIdList(no1);
-    // await res.forEach(async (id: string) => {
-    //     const data = await getServerDetails(locals.runtime.env, id);
-    //     servers.push(data.details);
-    //     serverModes.push(data.modes);
-    // });
+    // Get all new server ids
+    const res = await getIdList(page);
 
-    const no = Math.floor(Math.random() * (res.length));
-    const data = await getServerDetails(locals.runtime.env, res[no]);
-    if (!data) return new Response("rejected...");
+    // Get all existing foreign server ids
+    const existing = await drizzle(locals.runtime.env.DB).select({ id: serversTable.scrapedId }).from(serversTable).where(eq(serversTable.scrapedSource, "findmcserver.com"));
 
-    servers.push(data.details);
-    serverModes.push(data.modes);
+    // Get details and process each server
+    for (const r of res) {
+        if (existing.find((e: any) => e.id.id == r)) {
+            console.log("Skipped " + r + " because already exists");
+            continue;
+        }
+        const data = await getServerDetails(locals.runtime.env, r);
+        if (!data) {
+            console.log("Skipped " + r + " because not processable.");
+            continue;
+        }
+        servers.push(data.details);
+        serverModes.push(data.modes);
+    }
+
+    // Add to database - Split into 15 item chunks
+    for (let i = 0; i < servers.length; i += 15) await drizzle(locals.runtime.env.DB).insert(serversTable).values(servers.slice(i, i + 15)).execute();
+    for (let i = 0; i < serverModes.length; i += 15) await drizzle(locals.runtime.env.DB).insert(serverModesTable).values(serverModes.slice(i, i + 15)).execute();
 
 
-    await drizzle(locals.runtime.env.DB).insert(serversTable).values(servers).execute();
-    await drizzle(locals.runtime.env.DB).insert(serverModesTable).values(serverModes).execute();
-
-
-    return new Response(JSON.stringify(data));
+    return new Response("Success!");
 
 }
