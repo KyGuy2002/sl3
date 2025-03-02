@@ -91,7 +91,7 @@ export default function AdminTagMapPage() {
                     </TableCell>
                     <TableCell>
 
-                      <Combobox
+                      {/* <Combobox
                         placeholder='NONE SELECTED'
                         searchPrompt='Search for a tag...'
                         value={((mapping[name] && mapping[name][tag.id]) ? mapping[name][tag.id] : undefined)}
@@ -107,9 +107,9 @@ export default function AdminTagMapPage() {
                           ...tags.map((a) => ({ value: a.id, label: a.name, isMode: false, parentName: modes.find((m) => m.id == a.modeId)?.name })),
                           ...modes.map((a) => ({ value: a.id, label: a.name, isMode: true })),
                         ]}
-                      />
+                      /> */}
 
-                      {/* <select className='bg-gray-300 rounded-full px-3 py-1' 
+                      <select className='bg-gray-300 rounded-full px-3 py-1' 
                         value={((mapping[name] && mapping[name][tag.id]) ? mapping[name][tag.id] : undefined)} onChange={(e) => {
 
                         const newMapping = { ...mapping };
@@ -125,7 +125,7 @@ export default function AdminTagMapPage() {
                         {modes.map((a) => 
                           <option key={a.id} value={a.id}>{a.name} (mode)</option>
                         )}
-                      </select> */}
+                      </select>
                     </TableCell>
                   </TableRow>
                 )}
