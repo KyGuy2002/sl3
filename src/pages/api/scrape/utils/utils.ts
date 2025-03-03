@@ -1,4 +1,4 @@
-import type { ModeDetailsType, ServerLinkType, ServerModeType } from "../../server/utils";
+import type { ModeDetailsType, ServerLinkType, ServerModeTagType, ServerModeType } from "../../server/utils";
 import { drizzle } from "drizzle-orm/d1";
 import { allModesTable, allTagsTable, foreignTagMap } from "@/db/schema";
 import { and, eq, or } from "drizzle-orm";
@@ -129,8 +129,16 @@ export async function addIfMapped(env: any, serverModes: ServerModeType[], serve
         });
     }
 
-    // Add tag to mode (if its a tag)
-    if (!ourTag.isMode) serverModes.find((m: any) => m.modeId == ourTag.modeDetails.id)!.tags.push(ourTag.tagDetails!);
+    // Add tag to mode (if its a tag, and not already present [foreign tag mappings can point to the same tag])
+    const currentTags = serverModes.find((m: any) => m.modeId == ourTag.modeDetails.id)!.tags;
+    if (!ourTag.isMode && !currentTags.find((t: ServerModeTagType) => t.tagId == ourTag.tagDetails!.id)) {
+        currentTags.push({
+            serverId: serverId,
+            modeId: ourTag.modeDetails.id,
+            tagId: ourTag.tagDetails!.id,
+            details: ourTag.tagDetails!
+        });
+    }
 
     return true;
 }

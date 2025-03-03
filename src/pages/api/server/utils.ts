@@ -97,7 +97,7 @@ export type ServerModeType = {
     details: ModeDetailsType,
     cardDesc: string,
     fullDesc: string,
-    tags: TagDetailsType[]
+    tags: ServerModeTagType[]
 }
 
 export type ModeDetailsType = {
@@ -105,6 +105,13 @@ export type ModeDetailsType = {
     name: string,
     desc: string,
     aka: string[]
+}
+
+export type ServerModeTagType = {
+    serverId: string,
+    modeId: string,
+    tagId: string,
+    details: TagDetailsType
 }
 
 export type TagDetailsType = {
