@@ -74,12 +74,16 @@ async function getGameModes(env: any, serverId: string, desc: string, tags: any)
     const serverModes: ServerModeType[] = [];
 
     // Map existing gamemodes and tags
-    await tags.map(async (t: any) => {
-
+    for (const t of tags) {
+    
         // Get from map
         const mapped = await addIfMapped(env, serverModes, serverId, t.id, "findmcserver.com");
+        if (mapped) continue;
 
-    });
+        // TODO Not mapped, what do we do?
+        console.log("===== Unmnapped tag found in getGameModes:", serverId, t.name);
+
+    }
 
     // TODO get addtl gamemodes and tags from description
 

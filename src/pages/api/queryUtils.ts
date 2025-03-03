@@ -59,7 +59,7 @@ export async function runQuery(env: any, type: "tags" | "modes", query: string, 
 
     // Get embedding
     let embedTs = Date.now();
-    const { vector, cached } = await getOrGenEmbed(env, query, modeId);
+    const { vector, cached } = await getOrGenEmbed(env, query);
     embedTs = Date.now() - embedTs;
 
 
@@ -156,10 +156,9 @@ export async function runQuery(env: any, type: "tags" | "modes", query: string, 
 
 
 
-// TODO do we need modeid here?
-export async function getOrGenEmbed(env: any, query: string, modeId?: string) {
+export async function getOrGenEmbed(env: any, query: string) {
 
-    const hash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode((modeId ? modeId + query : "ismode" + query)));
+    const hash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(query));
 
     const hRes = await drizzle(env.DB)
         .select()

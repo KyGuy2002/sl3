@@ -2,6 +2,7 @@ import type { ModeDetailsType, ServerLinkType, ServerModeType } from "../../serv
 import { drizzle } from "drizzle-orm/d1";
 import { allModesTable, allTagsTable, foreignTagMap } from "@/db/schema";
 import { and, eq, or } from "drizzle-orm";
+import { getOrGenEmbed } from "../../queryUtils";
 
 
 
@@ -130,4 +131,32 @@ export async function addIfMapped(env: any, serverModes: ServerModeType[], serve
     if (!ourTag.isMode) serverModes.find((m: any) => m.modeId == ourTag.modeDetails.id)!.tags.push(ourTag.tagDetails!);
 
     return true;
+}
+
+
+/**
+ * Gets the n nearest matching tags or modes to the input string.
+ * Uses AI embeddings
+ * @param type tag or mode
+ * @param input Input string
+ * @param count How many to return
+ */
+export async function getNearestId(env: any, type: "tag" | "mode", input: string, count: number) {
+    const idx = type == "tag" ? env.VEC_TAGS : env.VEC_MODES;
+
+    // Get embedding
+    const { vector } = await getOrGenEmbed(env, input);
+    
+    
+    // Find matches in db
+    const nearest = await idx.query(
+        vector,
+        {
+            topK: count,
+            returnValues: false,
+        }
+    )
+
+    return nearest.matches;
+
 }
