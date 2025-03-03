@@ -4,8 +4,8 @@ import { capitalizeFirstLetter } from "@/components/utils";
  
 
 
-export async function getIdList(page: number): Promise<string[]> {
-    const res = await fetch(`https://findmcserver.com/api/servers?pageNumber=${page}&pageSize=10&sortBy=default&gamerSaferStatus=undefined&mojangStatus=undefined`);
+export async function getIdList(page: number, count: number): Promise<string[]> {
+    const res = await fetch(`https://findmcserver.com/api/servers?pageNumber=${page}&pageSize=${count}&sortBy=default&gamerSaferStatus=undefined&mojangStatus=undefined`);
     const json: any = await res.json();
 
     const ids: any[] = [];
@@ -43,7 +43,7 @@ export async function getServerDetails(env: any, foreignId: any) {
             bannerUrl: json.featuredImage?.url || json.backgroundImage?.url || "",
             javaIp: concatPort("java", json.javaAddress, json.javaPort),
             bedrockIp: concatPort("bedrock", json.bedrockAddress, json.bedrockPort),
-            otherJavaAddresses: json.secondaryAddresses.map((a: any) => concatPort(a.platform.toLowerCase(), a.address, a.port)),
+            otherJavaAddresses: json.secondaryAddresses?.map((a: any) => concatPort(a.platform.toLowerCase(), a.address, a.port)),
             onlinePlayers: json.currentOnlinePlayers,
             online: json.isOnline,
             created: new Date(json.launchedOn).getTime(),
@@ -81,7 +81,6 @@ async function getGameModes(env: any, serverId: string, desc: string, tags: any)
         if (mapped) continue;
 
         // TODO Not mapped, what do we do?
-        console.log("===== Unmnapped tag found in getGameModes:", serverId, t.name);
 
     }
 
@@ -116,8 +115,9 @@ function getLinks(json: any) {
             case "TWITCH": type = "TWITCH"; break;
             case "PATREON": type = "PATREON"; break;
             case "STORE": type = "STORE"; break;
+            case "BLUESKY": type = "BLUESKY"; break;
             default: {
-                console.log("===== Unknown link type found in getLinks:", json.ip, json.name, "Type:", link.social_media, "URL", link.url);
+                console.log("===== Unknown link type found in getLinks:", "Type: (", link.social_media, "). URL: (", link.url, ").");
                 type = capitalizeFirstLetter(link.social_media);
             }
         }

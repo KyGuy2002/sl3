@@ -11,6 +11,7 @@ import {
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Save } from 'lucide-react';
+import SearchSelect from './SearchSelect';
 
 export default function AdminTagMapPage() {
 
@@ -91,11 +92,10 @@ export default function AdminTagMapPage() {
                     </TableCell>
                     <TableCell>
 
-                      {/* <Combobox
-                        placeholder='NONE SELECTED'
-                        searchPrompt='Search for a tag...'
-                        value={((mapping[name] && mapping[name][tag.id]) ? mapping[name][tag.id] : undefined)}
-                        setValue={(v) => {
+                      <SearchSelect
+                        valueId={(mapping[name][tag.id])}
+                        valueLabel={tags.find((t) => t.id == mapping[name][tag.id])?.name || modes.find((t) => t.id == mapping[name][tag.id])?.name || "Select..."}
+                        onChange={(v) => {
 
                           const newMapping = { ...mapping };
                           if (!newMapping[name]) newMapping[name] = {};
@@ -103,29 +103,8 @@ export default function AdminTagMapPage() {
                           setMapping(newMapping);
   
                         }}
-                        items={[
-                          ...tags.map((a) => ({ value: a.id, label: a.name, isMode: false, parentName: modes.find((m) => m.id == a.modeId)?.name })),
-                          ...modes.map((a) => ({ value: a.id, label: a.name, isMode: true })),
-                        ]}
-                      /> */}
+                      />
 
-                      <select className='bg-gray-300 rounded-full px-3 py-1' 
-                        value={((mapping[name] && mapping[name][tag.id]) ? mapping[name][tag.id] : undefined)} onChange={(e) => {
-
-                        const newMapping = { ...mapping };
-                        if (!newMapping[name]) newMapping[name] = {};
-                        newMapping[name][tag.id] = e.target.value;
-                        setMapping(newMapping);
-
-                      }}>
-                        <option value=''>Select...</option>
-                        {tags.map((a) => 
-                          <option key={a.id} value={a.id}>{a.name} ({modes.find((m) => m.id == a.modeId)?.name})</option>
-                        )}
-                        {modes.map((a) => 
-                          <option key={a.id} value={a.id}>{a.name} (mode)</option>
-                        )}
-                      </select>
                     </TableCell>
                   </TableRow>
                 )}

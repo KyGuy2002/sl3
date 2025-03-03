@@ -9,7 +9,8 @@ import { getOrGenEmbed } from "../../queryUtils";
 /**
  * Compares links, ignoring scheme, www, and trailing slashes
  */
-export function linksSame(a: any, b: any) {
+export function linksSame(a: string | undefined, b: string | undefined) {
+    if (!a || !b) return false;
     const clean = (url: string) => url.replace(/(^\w+:|^)\/\//, '').replace("www.", "").replace(/\/$/, "");
     return clean(a) == clean(b);
 }
@@ -31,7 +32,7 @@ export function cleanupLinks(links: ServerLinkType[]): ServerLinkType[] {
     // TODO what if duplicate links of same type with different url?
 
     // If store and patreon are the same, remove patreon.
-    if (linksSame(links.find((l) => l.type === "STORE"), links.find((l) => l.type === "PATREON"))) {
+    if (linksSame(links.find((l) => l.type === "STORE")?.url, links.find((l) => l.type === "PATREON")?.url)) {
         links.splice(links.findIndex((l) => l.type === "PATREON"), 1);
     }
 
@@ -117,9 +118,10 @@ export async function addIfMapped(env: any, serverModes: ServerModeType[], serve
     if (!ourTag) return false;
 
     // Create new mode
-    if (!serverModes.find((m: any) => m.modeId == ourTag.modeDetails.id)) {
+    if (!serverModes.find((m: ServerModeType) => m.modeId == ourTag.modeDetails.id)) {
         serverModes.push({
-            id: serverId,
+            serverId: serverId,
+            modeId: ourTag.modeDetails.id,
             details: ourTag.modeDetails,
             cardDesc: "TODO need desc",
             fullDesc: "TODO need desc",

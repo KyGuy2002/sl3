@@ -51,8 +51,6 @@ export async function runFtsQuery(env: any, type: "tags" | "modes", query: strin
 
 
 export async function runQuery(env: any, type: "tags" | "modes", query: string, modeId?: string) {
-    if (type == "tags" && modeId == undefined) throw new Error("modeId is required for tags");
-
     const VEC_TABLE = type == "tags" ? env.VEC_TAGS : env.VEC_MODES;
     const DB_TABLE = type == "tags" ? allTagsTable : allModesTable;
 

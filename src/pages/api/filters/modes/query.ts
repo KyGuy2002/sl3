@@ -1,30 +1,39 @@
 import type { APIContext } from "astro";
-import { runFtsQuery } from "../../queryUtils";
+import { runFtsQuery, runQuery } from "../../queryUtils";
 
 
 export async function GET({ params, request, locals }: APIContext) {
 
+
     const query = new URL(request.url).searchParams.get("q");
     if (!query) return new Response("No query provided", { status: 400 });
 
-    const ts = Date.now();
-    const res = await runFtsQuery(locals.runtime.env, "modes", query);
+    const res = await runQuery(locals.runtime.env, "modes", query);
 
-    res.forEach((element: any) => {
-        element.aka = JSON.parse(element.aka);
-    });
+    return new Response(JSON.stringify(res))
 
-    return new Response(JSON.stringify({
-        mode: "normal",
-        bestItems: res,
-        items: [],
-        maybeItems: [],
-        count: res.length,
-        times: {
-            total: Date.now() - ts
-        },
-        cached: false
-    }));
+
+    // const query = new URL(request.url).searchParams.get("q");
+    // if (!query) return new Response("No query provided", { status: 400 });
+
+    // const ts = Date.now();
+    // const res = await runFtsQuery(locals.runtime.env, "modes", query);
+
+    // res.forEach((element: any) => {
+    //     element.aka = JSON.parse(element.aka);
+    // });
+
+    // return new Response(JSON.stringify({
+    //     mode: "normal",
+    //     bestItems: res,
+    //     items: [],
+    //     maybeItems: [],
+    //     count: res.length,
+    //     times: {
+    //         total: Date.now() - ts
+    //     },
+    //     cached: false
+    // }));
 
 
     // const type = new URL(request.url).searchParams.get("type");

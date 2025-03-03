@@ -92,7 +92,8 @@ export type ServerCardDetails = {
 }
 
 export type ServerModeType = {
-    id: string,
+    serverId: string,
+    modeId: string,
     details: ModeDetailsType,
     cardDesc: string,
     fullDesc: string,
