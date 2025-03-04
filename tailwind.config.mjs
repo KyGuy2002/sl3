@@ -50,10 +50,6 @@ export default {
     				'4': 'hsl(var(--chart-4))',
     				'5': 'hsl(var(--chart-5))'
     			},
-				discord: {
-					DEFAULT: '#5865f2',
-					hover: '#4f59c4'
-				}
     		},
 			animation: {
 				tilt: 'tilt 3s linear infinite',

@@ -1,3 +1,4 @@
+import type { ServerLinkType } from "@/pages/api/server/utils";
 import { int, sqliteTable, text, primaryKey, blob, uniqueKeyName, unique } from "drizzle-orm/sqlite-core";
 
 export const serversTable = sqliteTable("servers", {
@@ -15,6 +16,7 @@ export const serversTable = sqliteTable("servers", {
   logoUrl: text(),
   bannerUrl: text(),
   ipVisible: int({ mode: "boolean" }).notNull(),
+  links: text({ mode: "json" }).notNull().$type<ServerLinkType[]>(),
 
   scrapedSource: text(),
   scrapedTime: int(),

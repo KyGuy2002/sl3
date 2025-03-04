@@ -78,9 +78,8 @@ export type ServerCardDetails = {
     javaIp?: string,
     bedrockIp?: string,
     desc: string,
-    modes: [
-      ServerModeType
-    ],
+    modes: ServerModeType[],
+    links: ServerLinkType[],
     online: boolean,
     onlinePlayers: number,
     versionStart: string,
@@ -123,7 +122,8 @@ export type TagDetailsType = {
     modeId: string
 }
 
+// NOTE: Make sure to update in ServerLinkBtn.tsx
 export type ServerLinkType = {
-    type: "DISCORD" | "WEBSITE" | "FORUM" | "OTHER" | string,
+    type: "DISCORD" | "WEBSITE" | "YOUTUBE" | "EMAIL" | "TWITTER" | "INSTAGRAM" | "TIKTOK" | "FACEBOOK" | "TWITCH" | "BLUESKY" | "PATREON" | "TRAILER" | "PRIVACY" | "TERMS" | "RULES" | "STORE" | string,
     url: string
 }

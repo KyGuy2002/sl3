@@ -53,7 +53,7 @@ export async function getServerDetails(env: any, foreignId: any) {
             links: getLinks(json.serverMedias),
             locations: json.serverLocation.map((l: any) => l.description) || [],
             ipVisible: json.isMainAddressVisible,
-
+            ...getVersions(json),
             scrapedSource: "findmcserver.com",
             scrapedTime: Date.now(),
             scrapedId: {
@@ -66,6 +66,30 @@ export async function getServerDetails(env: any, foreignId: any) {
     }
 
     return data;
+}
+
+
+// NOTE: When only one tag is present, the versionStart is set and versionEnd is undefined.
+async function getVersions(json: any) {
+
+    const obj: Partial<{ versionStart: string, versionEnd: string }> = {};
+
+    // Get first (skip weird ones)
+    for (const v of json.version) {
+        if (v.name == "Latest-Bedrock" || v.name == "Latest-Snapshot") continue;
+        obj.versionStart = v.name.replace("X", 0);
+        continue;
+    }
+
+
+    // Get last or undefined (unless first not set, then both undefined)
+    const last = json.version[json.version.length - 1].name.replace("X", 0);
+    if (obj.versionStart != undefined && last != obj.versionStart) {
+        obj.versionEnd = last;
+    }
+    else obj.versionEnd = undefined;
+
+    return obj;
 }
 
 
@@ -103,6 +127,7 @@ function getLinks(json: any) {
     for (const link of json) {
         let type;
 
+        // NOTE: Make sure to update in ServerLinkType and ServerLinkBtn.tsx
         switch (link.social_media) {
             case "DISCORD": type = "DISCORD"; break;
             case "WEBSITE": type = "WEBSITE"; break;
