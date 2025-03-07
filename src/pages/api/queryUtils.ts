@@ -11,7 +11,7 @@ export async function runTypeaheadFtsQuery(env: any, type: "tags" | "modes", que
     newQuery = `name:^${newQuery}* OR aka:${newQuery}*`;
 
     // Start of name match
-    let res = await env.DB.prepare(`SELECT *, bm25(${DB_TABLE},3,1,2) as bm25, snippet(${DB_TABLE}, -1, '', '', '',32) FROM ${DB_TABLE} WHERE ${DB_TABLE} MATCH ? AND bm25 < 0 ORDER BY bm25 LIMIT 1`).bind(newQuery).run();
+    let res = await env.DB.prepare(`SELECT *, bm25(${DB_TABLE},3,1,2,0,0,0,0,0,0) as bm25, snippet(${DB_TABLE}, -1, '', '', '',32) FROM ${DB_TABLE} WHERE ${DB_TABLE} MATCH ? AND bm25 < 0 ORDER BY bm25 LIMIT 1`).bind(newQuery).run();
     res = res.results[0];
     if (!res) return undefined;
 
@@ -43,8 +43,15 @@ export async function runFtsQuery(env: any, type: "tags" | "modes", query: strin
     query = query.replaceAll(".", "");
     query = query.replaceAll(" ", " OR ");
     const res = await env.DB.prepare(
-        `SELECT *, bm25(${DB_TABLE},3,1,2) as bm25 FROM ${DB_TABLE} WHERE ${DB_TABLE} MATCH ? ${(modeId ? `AND modeId = ?` : ``)} AND bm25 < 0 ORDER BY bm25`
+        `SELECT *, bm25(${DB_TABLE},3,1,2,0,0,0,0,0,0) as bm25 FROM ${DB_TABLE} WHERE ${DB_TABLE} MATCH ? ${(modeId ? `AND modeId = ?` : ``)} AND bm25 < 0 ORDER BY bm25`
     ).bind(query, ...(modeId ? [modeId] : [])).run();
+
+    // Parse aka json (since not drizzle)
+    for (const r of res.results) {
+        if (r.aka) {
+            r.aka = JSON.parse(r.aka);
+        }
+    }
 
     return res.results;
 }

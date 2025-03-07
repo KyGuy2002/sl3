@@ -8,6 +8,8 @@ export async function GET({ params, request, locals }: APIContext) {
 
     const res = await runTypeaheadFtsQuery(locals.runtime.env, "modes", query);
 
-    return new Response(JSON.stringify(res));
+    return new Response(JSON.stringify({
+        value: res,
+    }));
 
 }

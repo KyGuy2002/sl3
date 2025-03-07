@@ -20,11 +20,12 @@ export default function ItemSearch(props: {
 
   const abortRef = useRef<AbortController>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const typeaheadRef = useRef<string | undefined>(null);
 
   const [selected, setSelected] = useState<TagDetailsType[]>([]);
 
   const [data, setData] = useState<any>();
-  const [typeahead, setTypeahead] = useState<any>();
+  const [typeahead, setTypeahead] = useState<string | undefined>();
   const [defData, setDefData] = useState<any>();
 
   const [loading, setLoading] = useState(true);
@@ -42,6 +43,10 @@ export default function ItemSearch(props: {
   }, [])
 
   useEffect(() => {
+    typeaheadRef.current = typeahead;
+  }, [typeahead])
+
+  useEffect(() => {
 
     if (props.onlyOne && selected.length > 0) props.onNext(selected);
 
@@ -55,10 +60,10 @@ export default function ItemSearch(props: {
   useEffect(() => {
 
     function handle(e: any) {
-      if (e.key === 'Tab' && typeahead) {
+      if (e.key === 'Tab' && typeahead != undefined) {
         e.preventDefault();
-        if (!inputRef.current) return;
-        inputRef.current.value = typeahead;
+        inputRef.current!.value = typeahead;
+        searchChange(typeahead);
         setTypeahead(undefined);
       }
       if (e.key === 'Enter') select(getFirstItem())
@@ -66,7 +71,7 @@ export default function ItemSearch(props: {
 
     document.addEventListener('keydown', handle);
     return () => document.removeEventListener('keydown', handle);
-  }, []);
+  }, [typeahead, data]);
 
 
   return (
@@ -113,13 +118,13 @@ export default function ItemSearch(props: {
 
                 <div className='w-full relative'>
                   <input ref={inputRef} placeholder={props.placeholder} className='focus:outline-transparent w-full text-black'
-                    onChange={searchChange}
+                    onChange={(e) => searchChange(e.target.value)}
                   />
 
                   <div className='absolute top-0 text-gray-400 flex items-center'>
                     <span className='opacity-0'>{inputRef.current?.value}</span>
                     {typeahead?.slice(inputRef.current?.value.length)}
-                    {typeahead && <p
+                    {typeahead && typeahead.toLowerCase() != inputRef.current?.value.toLowerCase() && <p
                       className='bg-gray-400 rounded-md text-[10px] font-bold text-white px-[5px] py-0.5
                       flex items-center gap-[0.5px] pr-[2.5px] w-max ml-1'
                     >
@@ -209,9 +214,9 @@ export default function ItemSearch(props: {
   }
 
 
-  async function searchChange(e: any) {
+  async function searchChange(value: any) {
 
-    if (!e.target.value || e.target.value === '' || e.target.value === ' ' || e.target.value.length == 0) {
+    if (!value || value === '' || value === ' ' || value.length == 0) {
       setData(defData);
       setTypeahead(undefined);
       return;
@@ -224,8 +229,8 @@ export default function ItemSearch(props: {
     abortRef.current = new AbortController();
     const signal = abortRef.current?.signal;
 
-    query(e.target.value, signal);
-    queryTypeahead(e.target.value, signal);
+    query(value, signal);
+    queryTypeahead(value, signal);
   }
 
 
@@ -240,11 +245,8 @@ export default function ItemSearch(props: {
       return;
     }
 
-    let t = await response.text();
-    if (!t) return;
-
-    t = t.replaceAll('"', '')
-    setTypeahead(t);
+    let t: any = await response.json();
+    setTypeahead(t.value); // Set to undefined if empty
   }
 
 
