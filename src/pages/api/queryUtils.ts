@@ -88,11 +88,16 @@ export async function runQuery(env: any, type: "tags" | "modes", query: string, 
 
     
     // Combine to one array
-    const res2 = nearest.matches.map((match: any) => ({
-        id: match.id,
-        score: match.score,
-        ...res.find((r: any) => r.id === match.id)
-    }));
+    // NOTE: Must loop from matches to keep order
+    const res2 = [];
+    for (const item of nearest.matches) {
+        const db = res.find((r: any) => r.id === item.id)
+        if (!db) continue; // Vector index can be out of sync with db (lag after update or something)
+        res2.push({
+            ...item,
+            ...db
+        });
+    }
 
 
     const maxScore = Math.max(...res2.map(item => item.score));

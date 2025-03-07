@@ -151,7 +151,7 @@ export async function addIfMapped(env: any, serverModes: ServerModeType[], serve
  * @param input Input string
  * @param count How many to return
  */
-export async function getNearestId(env: any, type: "tag" | "mode", input: string, count: number) {
+export async function getNearestId(env: any, type: "tag" | "mode", input: string, count: number, accuracy: "precise" | "fast") {
     const idx = type == "tag" ? env.VEC_TAGS : env.VEC_MODES;
 
     // Get embedding
@@ -163,7 +163,7 @@ export async function getNearestId(env: any, type: "tag" | "mode", input: string
         vector,
         {
             topK: count,
-            returnValues: false,
+            returnValues: (accuracy == "precise"), // returnValues: true is more accurate match but slower
         }
     )
 

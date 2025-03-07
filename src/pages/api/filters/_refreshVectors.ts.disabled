@@ -1,0 +1,38 @@
+import { allModesTable, allTagsTable } from "@/db/schema";
+import type { APIContext } from "astro";
+import { drizzle } from "drizzle-orm/d1";
+import { insertVectors } from ".";
+
+
+export async function GET({ params, request, locals }: APIContext) {
+
+
+
+    // NOTE!!!: You need to delete the index using cli BEFORE running this!
+    // npx wrangler vectorize delete sl2-modes-index !!(also do tags!)!!
+    // npx wrangler vectorize create sl2-tags-index --dimensions=768 --metric=cosine !!(also do modes!)!!
+
+
+
+    // TODO how to clear index?
+
+
+
+    const res1 = await drizzle(locals.runtime.env.DB)
+        .select()
+        .from(allTagsTable)
+
+    await insertVectors(locals.runtime.env, "tag", res1);
+
+    
+
+    const res2 = await drizzle(locals.runtime.env.DB)
+        .select()
+        .from(allModesTable)
+
+    await insertVectors(locals.runtime.env, "mode", res2);
+
+
+    return new Response("Success!")
+
+}

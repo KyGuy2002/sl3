@@ -78,14 +78,14 @@ async function extractRawItemsFromDesc(env: any, desc: string): Promise<{ featur
  * @param parseForType tag or mode
  * @param rawItems raw feature/gamemode keyword strings (usually from LLM)
  */
-async function getItemsFromRaws(env: any, parseForType: "tag" | "mode", rawItems: string[]) {
+export async function getItemsFromRaws(env: any, parseForType: "tag" | "mode", rawItems: string[]) {
     const table = parseForType == "tag" ? allTagsTable : allModesTable;
 
 
     // Find matches in db (concurrently)
     const promises = [];
     for (const item of rawItems) {
-        promises.push(getNearestId(env, parseForType, item, 1));
+        promises.push(getNearestId(env, parseForType, item, 1, "precise"));
     }
     const resp = await Promise.all(promises);
 

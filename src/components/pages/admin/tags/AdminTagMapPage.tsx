@@ -60,7 +60,8 @@ export default function AdminTagMapPage() {
 
       <h1 className='text-3xl font-bold mb-4'>Edit Tag Mappings</h1>
 
-      <div className='max-w-[800px]'>
+      {/* TODO: pb-20 is temp */}
+      <div className='max-w-[800px] pb-20'>
 
         <Button
           variant='destructive'

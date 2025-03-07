@@ -11,46 +11,79 @@ export async function POST({ params, request, locals }: APIContext) {
 
     if (!body.tags || !body.modes) return new Response('Invalid body', { status: 400 });
     
-    // Get current
-    const currentModes = await drizzle(locals.runtime.env.DB).select().from(allModesTable);
-    const currentTags = await drizzle(locals.runtime.env.DB).select().from(allTagsTable);
+    await processItems(locals.runtime.env, "tag", body.tags);
+    console.log("========")
+    await processItems(locals.runtime.env, "mode", body.modes);
 
-    // Get new modes
-    const newModes = body.modes.filter(m => !currentModes.find(cm => cm.id === m.id));
-
-    // Add new modes to db
-    if (newModes.length > 0) await drizzle(locals.runtime.env.DB).insert(allModesTable).values(newModes);
-
-    // Get new tags
-    const newTags = body.tags.filter(t => !currentTags.find(ct => ct.id === t.id));
-
-    // Add new tags to db
-    if (newTags.length > 0) await drizzle(locals.runtime.env.DB).insert(allTagsTable).values(newTags);
-
-    // Get edited modes
-    const editedModes = body.modes.filter(m => {
-        const current = currentModes.find(cm => cm.id === m.id);
-        if (newModes.includes(m)) return false;
-        return !_.isEqual(current, m);
-    });
-
-    // Update edited modes
-    for (const mode of editedModes) {
-        await drizzle(locals.runtime.env.DB).update(allModesTable).set(mode).where(eq(allModesTable.id, mode.id));
-    }
-
-    // Get edited tags
-    const editedTags = body.tags.filter(m => {
-        const current = currentTags.find(cm => cm.id === m.id);
-        if (newTags.includes(m)) return false;
-        return !_.isEqual(current, m);
-    });
-
-    // Update edited tags
-    for (const mode of editedTags) {
-        await drizzle(locals.runtime.env.DB).update(allTagsTable).set(mode).where(eq(allTagsTable.id, mode.id));
-    }
 
     return new Response('OK', { status: 200 });
 
+}
+
+
+
+async function processItems(env: any, type: "tag" | "mode", items: (ModeDetailsType | TagDetailsType)[]) {
+    const table = type == "tag" ? allTagsTable : allModesTable;
+
+    // Get current
+    const currentItems = await drizzle(env.DB).select().from(table);
+
+
+
+    // Get new items
+    const newItems = items.filter(m => !currentItems.find(cm => cm.id === m.id));
+
+    // Add new items to db
+    if (newItems.length > 0) {
+        console.log("Adding items: ", newItems.map((item) => item.name));
+        await drizzle(env.DB).insert(table).values(newItems);
+        await insertVectors(env, type, newItems);
+    }
+
+
+    // Get edited items
+    const editedItems = items.filter(m => {
+        const current = currentItems.find(cm => cm.id === m.id);
+        if (newItems.includes(m)) return false;
+        return !_.isEqual(current, m);
+    });
+
+    // Update edited items
+    for (const item of editedItems) {
+        console.log("Updating item: ", item.name);
+        await drizzle(env.DB).update(table).set(item).where(eq(table.id, item.id));
+    }
+    if (editedItems.length > 0 ) await insertVectors(env, type, editedItems);
+
+    // Get deleted items
+    const deletedItems = currentItems.filter(m => !items.find(bm => bm.id === m.id));
+
+    // Delete items in db
+    for (const item of deletedItems) {
+        console.log("Deleting item: ", item.name);
+        await drizzle(env.DB).delete(table).where(eq(table.id, item.id));
+    }
+    if (deletedItems.length > 0 ) await (type == "tag" ? env.VEC_TAGS : env.VEC_MODES).deleteByIds(deletedItems.map((item) => item.id));
+
+}
+
+
+
+export async function insertVectors(env: any, type: "tag" | "mode", items: (ModeDetailsType | TagDetailsType)[]) {
+    const { data: embeddings } = await env.AI.run(
+        "@cf/baai/bge-base-en-v1.5",
+        {
+            text: items.map((item) =>
+                item.name + ".  " + item.desc + ".  " + (item.aka as string[]).join(", ")
+            )
+        }
+    );
+
+    const vectors = items.map((item, i) => ({
+        id: item.id,
+        values: embeddings[i],
+        namespace: 'modeId' in item ? item.modeId : undefined // Mode ID to filter tags (if undefined its a tag so just set to undefined)
+    }));
+
+    await (type == "tag" ? env.VEC_TAGS : env.VEC_MODES).upsert(vectors)
 }

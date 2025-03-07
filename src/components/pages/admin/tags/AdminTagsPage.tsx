@@ -44,7 +44,8 @@ export default function AdminTagsPage() {
 
       <h1 className='text-3xl font-bold mb-4'>Edit Tags</h1>
 
-      <div className='max-w-[800px]'>
+      {/* TODO: pb-20 is temp */}
+      <div className='max-w-[800px] pb-20'>
 
         <Button
           variant='destructive'
@@ -93,6 +94,19 @@ export default function AdminTagsPage() {
                 setModes(updatedModes);
               }} />
 
+              <Button
+                variant='destructive'
+                className='mt-2'
+                onClick={() => {
+                  const updatedModes = [...modes];
+                  updatedModes.splice(i, 1);
+                  setModes(updatedModes);
+
+                  // Remove tags
+                  setTags(tags.filter((t) => t.modeId != m.id));
+                }}
+              >Delete</Button>
+
             </Card>
 
             <div className='flex flex-col gap-2 mt-2'>
@@ -121,17 +135,31 @@ export default function AdminTagsPage() {
                       setTags(updatedTags);
                     }} />
 
-                    <select className={'rounded-full text-sm font-semibold px-3 ' + getTagColor(t.type)} value={t.type}
-                      onChange={(e) => {
-                        const updatedTags = [...tags];
-                        updatedTags[tags.indexOf(tags.find(b => b.id == t.id)!)].type = e.target.value;
-                        setTags(updatedTags);
-                      }}
-                    >
-                      {['PLUGIN', 'FEATURE', 'STYLE', 'TOOL'].map((type) =>
-                        <option key={type} value={type}>{type}</option>
-                      )}
-                    </select>
+                    <div className='flex flex-col gap-2'>
+
+                      <select className={'rounded-full text-sm font-semibold px-3 ' + getTagColor(t.type)} value={t.type}
+                        onChange={(e) => {
+                          const updatedTags = [...tags];
+                          updatedTags[tags.indexOf(tags.find(b => b.id == t.id)!)].type = e.target.value;
+                          setTags(updatedTags);
+                        }}
+                      >
+                        {['PLUGIN', 'FEATURE', 'STYLE', 'TOOL'].map((type) =>
+                          <option key={type} value={type}>{type}</option>
+                        )}
+                      </select>
+
+                      <Button
+                        variant='destructive'
+                        className='mt-2'
+                        onClick={() => {
+                          const updatedTags = [...tags];
+                          updatedTags.splice(tags.indexOf(tags.find(b => b.id == t.id)!), 1);
+                          setTags(updatedTags);
+                        }}
+                      >Delete</Button>
+
+                    </div>
 
                   </div>
 

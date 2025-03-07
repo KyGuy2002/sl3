@@ -54,7 +54,7 @@ export const allTagsTable = sqliteTable("all_tags", {
   desc: text().notNull(),
   modeId: text().notNull().references(() => allModesTable.id),
   type: text().notNull(),
-  aka: text({ mode: "json" }).notNull(),
+  aka: text({ mode: "json" }).notNull().$type<string[]>(),
 }, (table) => {
   return {
     uk: unique("name-mode").on(table.name, table.modeId)
@@ -66,7 +66,7 @@ export const allModesTable = sqliteTable("all_modes", {
   id: text().notNull().primaryKey(),
   name: text().notNull().unique(),
   desc: text().notNull(),
-  aka: text({ mode: "json" }).notNull(),
+  aka: text({ mode: "json" }).notNull().$type<string[]>(),
 });
 
 
