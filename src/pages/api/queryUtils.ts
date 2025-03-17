@@ -33,6 +33,7 @@ export async function runTypeaheadFtsQuery(env: any, type: "tags" | "modes", que
 
 
 export async function runFtsQuery(env: any, type: "tags" | "modes", query: string, modeId?: string) {
+    console.log("Running FTS query:", query);
     const DB_TABLE = type == "tags" ? "all_tags_fts" : "all_modes_fts";
 
     // Exact match.  Rank: name, aka, desc (name most important)

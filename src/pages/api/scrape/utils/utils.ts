@@ -57,94 +57,6 @@ export function concatPort(platform: "bedrock" | "java", address: string | undef
 
 
 /**
- * Gets the corresponding local tag and/or mode for the specified foreign tag id.
- * @param foreignId Id of the foreign tag
- * @param site Name of the foreign site
- */
-async function getMappedTag(env: any, foreignId: string, site: string) {
-    const res = await drizzle(env.DB).select().from(foreignTagMap)
-        .leftJoin(allTagsTable, eq(foreignTagMap.ourId, allTagsTable.id))
-        .innerJoin(allModesTable, or(
-            eq(allTagsTable.modeId, allModesTable.id),
-            eq(foreignTagMap.ourId, allModesTable.id)
-        ))
-        .where(and(
-            eq(foreignTagMap.theirId, foreignId),
-            eq(foreignTagMap.website, site)
-        ));
-    
-    if (res.length == 0) return undefined;
-
-    const modeDetails: ModeDetailsType = {
-        id: res[0].all_modes.id,
-        name: res[0].all_modes.name,
-        desc: res[0].all_modes.desc,
-        aka: res[0].all_modes.aka as string[],
-    }
-    
-    // Is a mode
-    if (res[0].all_tags == null) return {
-        isMode: true,
-        modeDetails: modeDetails
-    }
-
-    // Is a tag
-    else return {
-        isMode: false,
-        tagDetails: {
-            modeId: modeDetails.id,
-            id: res[0].all_tags.id,
-            name: res[0].all_tags.name,
-            desc: res[0].all_tags.desc,
-            type: res[0].all_tags.type,
-            aka: res[0].all_tags.aka as string[],
-        },
-        modeDetails: modeDetails
-    }
-}
-
-
-
-/**
- * Adds a mode and/or tag corresponding to the foreign id if it is mapped.
- * @param serverModes Existing serverModes array
- * @param serverId Our server id to add into the serverModes array
- * @param foreignId Id of the tag on the foreign site
- * @param site Name of the foreign site
- */
-export async function addIfMapped(env: any, serverModes: ServerModeType[], serverId: string, foreignId: string, site: string) {
-    // Get from map
-    const ourTag = await getMappedTag(env, foreignId, site);
-    if (!ourTag) return false;
-
-    // Create new mode
-    if (!serverModes.find((m: ServerModeType) => m.modeId == ourTag.modeDetails.id)) {
-        serverModes.push({
-            serverId: serverId,
-            modeId: ourTag.modeDetails.id,
-            details: ourTag.modeDetails,
-            cardDesc: "TODO need desc",
-            fullDesc: "TODO need desc",
-            tags: [],
-        });
-    }
-
-    // Add tag to mode (if its a tag, and not already present [foreign tag mappings can point to the same tag])
-    const currentTags = serverModes.find((m: any) => m.modeId == ourTag.modeDetails.id)!.tags;
-    if (!ourTag.isMode && !currentTags.find((t: ServerModeTagType) => t.tagId == ourTag.tagDetails!.id)) {
-        currentTags.push({
-            serverId: serverId,
-            modeId: ourTag.modeDetails.id,
-            tagId: ourTag.tagDetails!.id,
-            details: ourTag.tagDetails!
-        });
-    }
-
-    return true;
-}
-
-
-/**
  * Gets the n nearest matching tags or modes to the input string.
  * Uses AI embeddings
  * @param type tag or mode
@@ -167,6 +79,15 @@ export async function getNearestId(env: any, type: "tag" | "mode", input: string
         }
     )
 
-    return nearest.matches;
+    const res = [];
+    for (const match of nearest.matches) {
+        res.push({
+            id: match.id,
+            score: match.score,
+            modeId: match.namespace
+        });
+    }
+
+    return res;
 
 }

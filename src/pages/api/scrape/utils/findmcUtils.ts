@@ -1,6 +1,7 @@
-import { addIfMapped, cleanupLinks, concatPort } from "./utils";
+import { cleanupLinks, concatPort } from "./utils";
 import type { ServerLinkType, ServerModeType } from "../../server/utils";
 import { capitalizeFirstLetter } from "@/components/utils";
+import extractItemsFromDesc from "./scrapeUtils";
  
 
 
@@ -34,7 +35,7 @@ export async function getServerDetails(env: any, foreignId: any) {
     // TODO what is hostName/isHostVisible and what is statusName
 
     const id = crypto.randomUUID();
-    const data = {
+    const data: any = {
         details: {
             id: id,
             name: json.name,
@@ -61,9 +62,38 @@ export async function getServerDetails(env: any, foreignId: any) {
                 id: json.id
             }
         },
-
-        modes: await getGameModes(env, id, json.longDescription, json.serverTags),
     }
+
+    // Add parsed data
+    const parseRes = await extractItemsFromDesc(env, data.details.desc, "findmcserver.com", json.serverTags.map((t: any) => t.id));
+
+    // Combine modes and tags
+    const finalModes: ServerModeType[] = [];
+    for (const mode of parseRes.modes) {
+
+        const newMode: ServerModeType = {
+            details: mode,
+            modeId: mode.id,
+            serverId: id,
+            cardDesc: parseRes.cardDescs[mode.id],
+            fullDesc: "test",
+            tags: parseRes.tags.filter((t) => t.modeId == mode.id).map((t) => {
+                return {
+                    tagId: t.id,
+                    modeId: mode.id,
+                    serverId: id,
+                    details: t
+                }
+            })
+        }
+
+        finalModes.push(newMode);
+    }
+
+    data.details.gameModes = finalModes;
+
+    const allLinks = [  ...data.details.links, ...parseRes.links ];
+    data.details.links = cleanupLinks(allLinks);
 
     return data;
 }
@@ -93,29 +123,6 @@ async function getVersions(json: any) {
 }
 
 
-
-async function getGameModes(env: any, serverId: string, desc: string, tags: any) {
-    const serverModes: ServerModeType[] = [];
-
-    // Map existing gamemodes and tags
-    for (const t of tags) {
-    
-        // Get from map
-        const mapped = await addIfMapped(env, serverModes, serverId, t.id, "findmcserver.com");
-        if (mapped) continue;
-
-        // TODO Not mapped, what do we do?
-
-    }
-
-    // TODO get addtl gamemodes and tags from description
-
-    return serverModes;
-
-}
-
-
-
 function getLinks(json: any) {
     const links: ServerLinkType[] = [];
 
@@ -142,6 +149,7 @@ function getLinks(json: any) {
             case "STORE": type = "STORE"; break;
             case "BLUESKY": type = "BLUESKY"; break;
             default: {
+                // TODO try to find using other logic
                 console.log("===== Unknown link type found in getLinks:", "Type: (", link.social_media, "). URL: (", link.url, ").");
                 type = capitalizeFirstLetter(link.social_media);
             }
@@ -153,5 +161,5 @@ function getLinks(json: any) {
         });
     }
 
-    return cleanupLinks(links);;
+    return links;
 }

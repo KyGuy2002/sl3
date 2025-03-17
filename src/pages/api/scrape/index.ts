@@ -15,7 +15,7 @@ export async function GET({ params, request, locals }: APIContext) {
     const serverModes: any = [];
 
     // Get all new server ids
-    const res = await getIdList(page, 10);
+    const res = await getIdList(page, 1);
 
     // Get all existing foreign server ids
     const existing = await drizzle(locals.runtime.env.DB).select({ id: serversTable.scrapedId }).from(serversTable).where(eq(serversTable.scrapedSource, "findmcserver.com"));
@@ -32,11 +32,14 @@ export async function GET({ params, request, locals }: APIContext) {
             continue;
         }
 
+        return new Response(JSON.stringify(data));
+
         // Skip mode if has no tags
         for (const mode of data.modes) {
             if (mode.tags.length == 0) {
                 console.log("\u001b[1;36m === Skipped " + r.slug + " mode " + mode.details.name + " because no tags.");
                 data.modes = data.modes.filter((m: ServerModeType) => m.modeId != mode.modeId);
+                // TODO remove this!
                 continue;
             }
         }
@@ -53,8 +56,6 @@ export async function GET({ params, request, locals }: APIContext) {
 
     console.log("\u001b[1;32m Scraped " + servers.length + " servers");
     console.log("\u001b[1;32m Scraped " + serverModes.length + " server modes");
-
-    // return new Response(JSON.stringify({ servers, serverModes }));
 
     // Add to database - Split into 5 item chunks
     const SIZE = 5;

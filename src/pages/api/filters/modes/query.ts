@@ -1,5 +1,5 @@
 import type { APIContext } from "astro";
-import { runFtsQuery, runQuery } from "../../queryUtils";
+import { runQuery } from "../../queryUtils";
 
 
 export async function GET({ params, request, locals }: APIContext) {
@@ -8,19 +8,15 @@ export async function GET({ params, request, locals }: APIContext) {
     const query = new URL(request.url).searchParams.get("q");
     if (!query) return new Response("No query provided", { status: 400 });
 
-    // const res = await runQuery(locals.runtime.env, "modes", query);
-
-    // return new Response(JSON.stringify(res))
-
-    const res1 = await runFtsQuery(locals.runtime.env, "modes", query);
+    const res = await runQuery(locals.runtime.env, "modes", query);
 
 
     return new Response(JSON.stringify({
         mode: "normal",
-        bestItems: res1,
+        bestItems: res,
         items: [],
         maybeItems: [],
-        count: res1.length,
+        count: res.length,
         times: {
             total: -1
         },

@@ -102,8 +102,33 @@ export const embedCache = sqliteTable("embed_cache", {
 });
 
 
+/**
+ * This is a one to many relationship.
+ * For each foreign tag, we can have multiple of our tags.
+ * If there are multiple of our tags for a single foreign tag,
+ * it means that the foreign tag is ambiguous and CAN map to multiple of our tags.
+ * The scraping logic will ONLY include these tags if their parent mode is already found another way.
+ * If there is only one, then it is a direct mapping and the parent mode will be added additionally if not already found.
+ * <br/>
+ * This is stored as a row for each of these relationships.
+ */
 export const foreignTagMap = sqliteTable("foreign_tag_map", {
-  ourId: text().notNull(), // TODO references here?
-  theirId: text().notNull().unique(),
+  ourId: text().notNull().references(() => allTagsTable.id),
+  theirId: text().notNull(),
+  website: text().notNull()
+}, (table) => {
+  return {
+    pk: primaryKey({ columns: [table.ourId, table.theirId] })
+  };
+});
+
+
+/**
+ * This is a one to one relationship.
+ * For each foreign mode, we can have one of our modes.
+ */
+export const foreignModeMap = sqliteTable("foreign_mode_map", {
+  ourId: text().notNull().references(() => allModesTable.id),
+  theirId: text().notNull().primaryKey(),
   website: text().notNull()
 });
