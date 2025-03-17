@@ -11,16 +11,6 @@ export async function GET({ params, request, locals }: APIContext) {
     const res = await runQuery(locals.runtime.env, "modes", query);
 
 
-    return new Response(JSON.stringify({
-        mode: "normal",
-        bestItems: res,
-        items: [],
-        maybeItems: [],
-        count: res.length,
-        times: {
-            total: -1
-        },
-        cached: false
-    }));
+    return new Response(JSON.stringify(res));
 
 }

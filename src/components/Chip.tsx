@@ -8,7 +8,7 @@ export default function Chip(props: {
     hideX?: boolean,
 }) {
     return (
-        <Card className={classNames("flex items-center gap-1.5 px-4 py-0.5 group", {
+        <Card className={classNames("w-max flex items-center gap-1.5 px-4 py-0.5 group", {
             'cursor-pointer': !props.hideX,
         })} onClick={props.onClose}>
             <p className=" font-medium text-[15px]">{props.name}</p>
