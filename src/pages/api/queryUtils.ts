@@ -32,17 +32,14 @@ export async function runTypeaheadFtsQuery(env: any, type: "tags" | "modes", que
 }
 
 
-export async function runFtsQuery(env: any, type: "tags" | "modes", query: string, modeId?: string) {
-    console.log("Running FTS query:", query);
+export async function runFtsQuery(env: any, type: "tags" | "modes", query: string, searchType: "exact" | "or", modeId?: string) {
     const DB_TABLE = type == "tags" ? "all_tags_fts" : "all_modes_fts";
 
     // Exact match.  Rank: name, aka, desc (name most important)
-    query = query.replaceAll("-", " "); // TODO why is a - breaking it??!?!!!!???!?!!
-    query = query.replaceAll("\"", "");
-    query = query.replaceAll("\'", "");
-    query = query.replaceAll(",", "");
-    query = query.replaceAll(".", "");
-    query = query.replaceAll(" ", " OR ");
+    query = query.replaceAll("\"", "\"\""); // Escape quotes (SQL Style)
+    if (searchType == "or") query = query.split(" ").join("\" OR \""); // Split words into OR and add quotes
+    query = "\"" + query + "\""; // Add quotes to start and end    
+
     const res = await env.DB.prepare(
         `SELECT *, bm25(${DB_TABLE},3,1,2,0,0,0,0,0,0) as bm25 FROM ${DB_TABLE} WHERE ${DB_TABLE} MATCH ? ${(modeId ? `AND modeId = ?` : ``)} AND bm25 < 0 ORDER BY bm25`
     ).bind(query, ...(modeId ? [modeId] : [])).run();

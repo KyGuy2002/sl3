@@ -76,7 +76,7 @@ export async function getServerDetails(env: any, foreignId: any) {
             modeId: mode.id,
             serverId: id,
             cardDesc: parseRes.cardDescs[mode.id],
-            fullDesc: "test",
+            fullDesc: undefined, // This field is not scraped
             tags: parseRes.tags.filter((t) => t.modeId == mode.id).map((t) => {
                 return {
                     tagId: t.id,

@@ -1,6 +1,6 @@
 import type { ServerLinkType } from "@/pages/api/server/utils";
 import { buttonVariants } from "./ui/button";
-import { Globe, Mail, Video } from "lucide-react";
+import { Globe, Mail, Map, Video } from "lucide-react";
 
 export default function ServerLinkBtn(props: ServerLinkType) {
 
@@ -8,6 +8,7 @@ export default function ServerLinkBtn(props: ServerLinkType) {
     switch (props.type) {
         case "DISCORD": return <ImgLink className="bg-[#5865f2]! hover:bg-blue-600!"/>
         case "WEBSITE": return <Link><Globe/>Website</Link>
+        case "MAP": return <Link><Map/>Map</Link>
         case "YOUTUBE": return <ImgLink className="bg-[#FF0000]! hover:bg-red-600!"/>
         case "EMAIL": return <Link><Mail/>Contact</Link>
         case "TWITTER": return <ImgLink className="bg-black"/>

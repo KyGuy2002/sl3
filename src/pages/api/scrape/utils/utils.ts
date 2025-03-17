@@ -22,6 +22,9 @@ export function linksSame(a: string | undefined, b: string | undefined) {
  */
 export function cleanupLinks(links: ServerLinkType[]): ServerLinkType[] {
 
+    // Remove invalid links
+    links = links.filter((link) => link.url.includes("."));
+
     // Remove duplicates
     links = links.filter((link, index, self) =>
         index === self.findIndex((t) => (

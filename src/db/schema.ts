@@ -29,7 +29,7 @@ export const serverModesTable = sqliteTable("server_modes", {
   serverId: text().notNull().references(() => serversTable.id),
   modeId: text().notNull().references(() => allModesTable.id),
   cardDesc: text().notNull(),
-  fullDesc: text().notNull(),
+  fullDesc: text(),
 }, (table) => {
   return {
     pk: primaryKey({ columns: [table.serverId, table.modeId] })

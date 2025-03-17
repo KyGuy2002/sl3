@@ -17,6 +17,13 @@ export async function GET({ params, request, locals }: APIContext) {
     // Get all new server ids
     const res = await getIdList(page, 1);
 
+    // const res = [
+    //     {
+    //         slug: "libregalaxy",
+    //         id: "36ce882f-27ef-4567-912a-9b362dfda4a3"
+    //     }
+    // ]
+
     // Get all existing foreign server ids
     const existing = await drizzle(locals.runtime.env.DB).select({ id: serversTable.scrapedId }).from(serversTable).where(eq(serversTable.scrapedSource, "findmcserver.com"));
 

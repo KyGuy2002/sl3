@@ -95,7 +95,7 @@ export type ServerModeType = {
     modeId: string,
     details: ModeDetailsType,
     cardDesc: string,
-    fullDesc: string,
+    fullDesc?: string,
     tags: ServerModeTagType[]
 }
 

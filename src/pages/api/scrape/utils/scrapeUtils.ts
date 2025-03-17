@@ -23,28 +23,22 @@ export default async function extractItemsFromDesc(env: any, desc: string, site:
     const [ mappedItems, llmDetails ] = await Promise.all<[MappedTagType[], any]>(promises);
     promises = [];
 
+    console.log(mappedItems)
+
     console.log("2")
-
-
-    // Get all for-sure gamemodes from LLM
-    promises.push((async () => {
-        const ors = llmDetails.ourModeNames.map((mode: string) => eq(allModesTable.name, mode));
-        const llmModes = await drizzle(env.DB).select().from(allModesTable).where(or(...ors));
-        return llmModes;
-    })());
 
     // Get embedded tags from llm feature summary 
     promises.push(getItemIdsFromRawsEmbed(env, "tag", llmDetails.rawFeatures));
     promises.push(getItemIdsFromRawsFts(env, "tag", llmDetails.rawFeatures));
 
     // Execute
-    const [ llmModes, embedTags, ftsTags ] = await Promise.all<[any, any, any]>(promises);
+    const [ embedTags, ftsTags ] = await Promise.all<[any, any]>(promises);
 
     console.log("3")
 
 
     // Get all for-sure gamemodes from mapped items
-    const mappedModes: ModeDetailsType[] = [];
+    let mappedModes: ModeDetailsType[] = [];
     for (const item of mappedItems) {
         if (item.isMode) { // Modes
             mappedModes.push(item.modeDetails);
@@ -57,8 +51,18 @@ export default async function extractItemsFromDesc(env: any, desc: string, site:
 
     console.log("4")
 
+    // Remove duplicates from mappedModes
+    const seen = new Set();
+    const filteredModes = mappedModes.filter((mode) => {
+        const duplicate = seen.has(mode.id);
+        seen.add(mode.id);
+        return !duplicate;
+    }
+    );
+    mappedModes = filteredModes;
+
     // Combine llmModes with mappedModes
-    for (const mode of llmModes) {
+    for (const mode of llmDetails.ourModes) {
         if (mappedModes.find((m) => m.id == mode.id)) continue;
         mappedModes.push(mode);
     }
@@ -70,11 +74,14 @@ export default async function extractItemsFromDesc(env: any, desc: string, site:
     for (const item of mappedItems) {
         if (item.isMode) continue;
 
+        // Skip if duplicate
+        if (mappedTags.find((m) => m.id == item.tagDetails.id)) continue;
+
         if (!item.isAmbiguous) { // Non-ambiguous tags
             mappedTags.push(item.tagDetails);
         }
 
-        else if (item.isAmbiguous && mappedModes.includes(item.modeDetails)) { // Ambiguous tags where we already have parent mode (from map or llm)
+        else if (item.isAmbiguous && mappedModes.find((m) => m.id == item.modeDetails.id)) { // Ambiguous tags where we already have parent mode (from map or llm)
             mappedTags.push(item.tagDetails);
         }
     }
@@ -135,16 +142,18 @@ function processLink(link: string): ServerLinkType {
     let type = "WEBSITE";
 
     // TODO make this more robust
-    if (link.includes("discord.gg/")) type = "DISCORD";
-    else if (link.includes("twitter.com/") || link.includes("x.com/")) type = "TWITTER";
-    else if (link.includes("instagram.com/")) type = "INSTAGRAM";
-    else if (link.includes("youtube.com/") || link.includes("youtu.be/")) type = "YOUTUBE";
-    else if (link.includes("tiktok.com/")) type = "TIKTOK";
-    else if (link.includes("facebook.com/")) type = "FACEBOOK";
-    else if (link.includes("twitch.tv/")) type = "TWITCH";
-    else if (link.includes("patreon.com/")) type = "PATREON";
-    else if (link.includes("store.")) type = "STORE";
-    else if (link.includes("bluesky.")) type = "BLUESKY";
+    if (link.includes("discord")) type = "DISCORD";
+    else if (link.includes("twitter") || link.includes("x.com/")) type = "TWITTER";
+    else if (link.includes("instagram")) type = "INSTAGRAM";
+    else if (link.includes("youtube") || link.includes("youtu.be/")) type = "YOUTUBE";
+    else if (link.includes("tiktok")) type = "TIKTOK";
+    else if (link.includes("facebook")) type = "FACEBOOK";
+    else if (link.includes("twitch")) type = "TWITCH";
+    else if (link.includes("patreon")) type = "PATREON";
+    else if (link.includes("store")) type = "STORE";
+    else if (link.includes("bluesky")) type = "BLUESKY";
+    else if (link.includes("map")) type = "MAP";
+    else if (link.includes("mailto:") || link.includes("@gmail.com")) type = "EMAIL";
 
     // TODO move cleanup to here instead of frontend (add https, add mailto, etc)
 
